@@ -1,0 +1,11 @@
+# Semantic FAQ Chatbot — pinned runtime dependencies (CPU-only, local-first)
+# Python 3.12
+
+streamlit==1.38.0
+sentence-transformers==3.0.1
+faiss-cpu==1.8.0
+numpy==1.26.4
+python-dotenv==1.0.1
+
+# --- dev / test (install with: pip install -r requirements.txt -r requirements-dev.txt) ---
+# kept separate so production installs stay lean; see requirements-dev.txt

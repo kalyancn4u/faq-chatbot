@@ -1,0 +1,31 @@
+question,answer,category,tags
+How do I reset my password?,"Click ""Forgot Password"" on the login page, enter your email, and follow the link we send to choose a new password.",Account,password|login|reset
+I forgot my password.,"No problem. Use the ""Forgot Password"" link on the login page and we'll email you a secure link to set a new one.",Account,password|login
+I can't remember my login credentials.,"If you can't recall your password, use ""Forgot Password"" on the login page. If you've also forgotten your email, contact support and we'll help verify your identity.",Account,password|login|credentials
+How can I recover my account password?,"You can recover access by requesting a password reset from the login page. The reset link expires after 30 minutes for security.",Account,password|recovery
+How do I change my password while logged in?,"Go to Settings > Security > Change Password, enter your current password, then set a new one.",Account,password|security|settings
+How do I update my email address?,"Open Settings > Profile, edit your email, and confirm the change via the verification link we send to the new address.",Account,email|profile|settings
+How do I delete my account?,"Go to Settings > Account > Delete Account. This is permanent and removes your data after a 14-day grace period.",Account,account|delete|privacy
+How do I create a new account?,"Click ""Sign Up"" on the home page, enter your email and a password, and verify your email to activate the account.",Account,signup|account|registration
+Why is my account locked?,"Accounts lock after several failed login attempts. Wait 15 minutes and try again, or reset your password to unlock immediately.",Account,account|locked|security
+How do I enable two-factor authentication?,"Go to Settings > Security > Two-Factor Authentication and follow the steps to link an authenticator app.",Account,security|2fa|authentication
+What payment methods do you accept?,"We accept major credit and debit cards (Visa, Mastercard, Amex) and PayPal.",Billing,payment|billing|cards
+How do I update my billing information?,"Go to Settings > Billing to update your card or billing address. Changes apply to your next invoice.",Billing,billing|payment|settings
+How do I get a refund?,"Refunds can be requested within 30 days of purchase from Settings > Billing > Order History. Approved refunds take 5-10 business days.",Billing,refund|billing|returns
+Why was I charged twice?,"Duplicate charges are usually a temporary authorization hold that clears within a few days. If it persists, contact support with your order number.",Billing,billing|charge|payment
+How do I cancel my subscription?,"Go to Settings > Billing > Subscription and click Cancel. You'll keep access until the end of the current billing period.",Billing,subscription|cancel|billing
+Where can I find my invoice?,"All invoices are available under Settings > Billing > Order History, where you can download them as PDF.",Billing,invoice|billing|receipt
+How long does shipping take?,"Standard shipping takes 3-5 business days. Expedited options are shown at checkout.",Shipping,shipping|delivery|orders
+How do I track my order?,"Once your order ships, we email a tracking link. You can also find it under Orders > Track in your account.",Shipping,shipping|tracking|orders
+Do you ship internationally?,"Yes, we ship to most countries. International delivery typically takes 7-14 business days and customs fees may apply.",Shipping,shipping|international|delivery
+My package hasn't arrived. What should I do?,"If your tracking hasn't updated in 5 business days, contact support with your order number and we'll investigate.",Shipping,shipping|delivery|support
+How do I return an item?,"Start a return from Orders > Return within 30 days of delivery. We'll email a prepaid label once approved.",Returns,returns|refund|orders
+What is your return policy?,"Most items can be returned within 30 days in original condition. Some items, like final-sale goods, are non-returnable.",Returns,returns|policy|refund
+How do I exchange a product?,"To exchange an item, start a return and place a new order for the replacement. This ensures the fastest turnaround.",Returns,returns|exchange|orders
+The app keeps crashing. How do I fix it?,"Try updating to the latest version and restarting your device. If it continues, clear the app cache or reinstall.",Technical,app|crash|troubleshooting
+How do I update the app?,"Update through the App Store or Google Play. Enable automatic updates to always run the latest version.",Technical,app|update|troubleshooting
+The website won't load. What can I do?,"Check your internet connection, clear your browser cache, and try a different browser. Our status page shows any outages.",Technical,website|troubleshooting|browser
+How do I contact customer support?,"You can reach support via the Help > Contact Us form, by email at support@example.com, or live chat during business hours.",General,support|contact|help
+What are your business hours?,"Our support team is available Monday to Friday, 9 AM to 6 PM local time, excluding public holidays.",General,hours|support|contact
+Is my personal data secure?,"Yes. We encrypt data in transit and at rest, and never sell your personal information. See our Privacy Policy for details.",General,privacy|security|data
+How do I change my notification settings?,"Go to Settings > Notifications to choose which emails and push alerts you receive.",General,notifications|settings|preferences
