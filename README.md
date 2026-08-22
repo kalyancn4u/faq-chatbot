@@ -50,9 +50,13 @@ extensive footnotes, pitfalls, and hands-on exercises on every page.
   auto-published to GitHub Pages on every push (combined deck + one per chapter).
 - **[📖 Glossary](docs/walkthrough/GLOSSARY.md)** — every term (embedding, cosine, FAISS,
   invariant, soft-delete…) defined in plain language.
-- **[🛠️ Build-it-yourself playbook](instructions_ppt.md)** — `instructions_ppt.md`: how to
-  create a walk-through like this from scratch (structure, the Marp design system, the build
-  pipeline, overflow discipline, WCAG-aware type/contrast, and publishing).
+- **[🛠️ Build-it-yourself playbook](instructions_ppt.md)** — `instructions_ppt.md`: the
+  narrated how-and-why of building a walk-through like this (structure, the Marp design system,
+  the build pipeline, overflow discipline, WCAG-aware type/contrast, and publishing).
+- **[📦 Portable kit for *any* repo](instructions_codewalk.md)** — `instructions_codewalk.md`:
+  a self-contained, repo-agnostic recipe with the exact theme CSS, `.marprc.yml`, build script,
+  and Pages workflow — drop it into any project to generate the markdown docs, the HTML decks,
+  and a live `github.io` site.
 
 **Read it, present it, or build the decks yourself:**
 

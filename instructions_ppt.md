@@ -278,6 +278,8 @@ Then every push rebuilds and republishes the decks automatically.
 
 ---
 
-*This playbook describes how the walk‑through in this repo was built. See
-[`instructions.md`](instructions.md) for the project spec, and the live decks at the
+*This playbook describes how the walk‑through in **this** repo was built. For a
+**repo‑agnostic, copy‑paste kit** (the exact theme CSS, config, build script, and Pages
+workflow, ready for any project) see [`instructions_codewalk.md`](instructions_codewalk.md).
+See also [`instructions.md`](instructions.md) for the project spec, and the live decks at the
 [walk‑through landing page](docs/walkthrough/README.md).*

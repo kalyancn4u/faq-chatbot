@@ -4,7 +4,8 @@
 
 **Related docs:**
 [`docs/walkthrough/`](docs/walkthrough/README.md) — the beginner‑to‑mastery code walk‑through ·
-[`instructions_ppt.md`](instructions_ppt.md) — **how to build a code‑walk‑through presentation from scratch** (structure, the Marp design system, build pipeline, overflow discipline, and publishing).
+[`instructions_ppt.md`](instructions_ppt.md) — **how to build this walk‑through** (narrated: design system, build pipeline, overflow discipline, publishing) ·
+[`instructions_codewalk.md`](instructions_codewalk.md) — **portable, repo‑agnostic kit** to generate the same (markdown docs + HTML decks + a live `github.io` site) for *any* repository.
 
 ---
 
