@@ -23,12 +23,9 @@ The hard part is that the last one shares almost no words with the first. Keywor
 search would fail; **semantic search**[2] succeeds.
 
 > **Footnotes**
-> [1] *Curated* means a human wrote the answer and stored it. The bot **retrieves**
-> it; it does not **generate** new text. This is a deliberate Version-1 choice —
-> see Chapter 6 for why "no generation" prevents hallucination.
-> [2] ***Semantic search*** = searching by meaning. We turn text into numbers that
-> capture meaning (an *embedding*), then find stored questions whose numbers are
-> closest. Defined fully in [Chapter 4](04-embeddings.md).
+>
+> - **[1]** *Curated* means a human wrote the answer and stored it. The bot **retrieves** it; it does not **generate** new text. This is a deliberate Version-1 choice — see Chapter 6 for why "no generation" prevents hallucination.
+> - **[2]** ***Semantic search*** = searching by meaning. We turn text into numbers that capture meaning (an *embedding*), then find stored questions whose numbers are closest. Defined fully in [Chapter 4](04-embeddings.md).
 
 ---
 
@@ -46,13 +43,10 @@ search would fail; **semantic search**[2] succeeds.
 Everything in the codebase is an implementation detail of one of these four ideas.
 
 > **Footnotes**
-> [1] A *vector* here is just a fixed-length array of floats, e.g. 384 numbers for
-> our model. "Similar meaning → nearby vectors" is the entire trick.
-> [2] "Fast" matters at scale, but even for a few thousand FAQs a good index keeps
-> the UI instant. We use an **exact** index (no approximation) — Chapter 5.
-> [3] "System of record" is a data-architecture term for *the* trusted copy. If two
-> stores ever disagree, this one wins. Here, FAISS is rebuilt from SQLite — never
-> the other way around.
+>
+> - **[1]** A *vector* here is just a fixed-length array of floats, e.g. 384 numbers for our model. "Similar meaning → nearby vectors" is the entire trick.
+> - **[2]** "Fast" matters at scale, but even for a few thousand FAQs a good index keeps the UI instant. We use an **exact** index (no approximation) — Chapter 5.
+> - **[3]** "System of record" is a data-architecture term for *the* trusted copy. If two stores ever disagree, this one wins. Here, FAISS is rebuilt from SQLite — never the other way around.
 
 ---
 
@@ -64,12 +58,9 @@ Read it top to bottom: that arrow is *exactly* the journey each chapter zooms in
 A plain-text version is on the next slide (screen-reader and terminal friendly).[2]
 
 > **Footnotes**
-> [1] Notice the split of responsibilities: **embeddings** understand language,
-> **FAISS** finds candidates, **SQLite** holds truth, **services** make decisions,
-> **UI** presents. This separation is not decoration — it is what makes each part
-> testable and replaceable (Chapter 9).
-> [2] Same information, two forms — the diagram for a quick visual grasp, the text
-> for accessibility and copy-paste. Separate slides keep each one legible.
+>
+> - **[1]** Notice the split of responsibilities: **embeddings** understand language, **FAISS** finds candidates, **SQLite** holds truth, **services** make decisions, **UI** presents. This separation is not decoration — it is what makes each part testable and replaceable (Chapter 9).
+> - **[2]** Same information, two forms — the diagram for a quick visual grasp, the text for accessibility and copy-paste. Separate slides keep each one legible.
 
 ---
 
@@ -117,9 +108,8 @@ A plain-text version is on the next slide (screen-reader and terminal friendly).
 ```
 
 > **Footnotes**
-> [1] Each box names the responsible package and its chapter, so you can trace the
-> flow straight into the code: `app/ui/` (Ch 8) → `app/embeddings/` (Ch 4) →
-> `app/retrieval/` (Ch 5) → `app/database/` (Ch 3) → `app/services/` (Ch 6–7).
+>
+> - **[1]** Each box names the responsible package and its chapter, so you can trace the flow straight into the code: `app/ui/` (Ch 8) → `app/embeddings/` (Ch 4) → `app/retrieval/` (Ch 5) → `app/database/` (Ch 3) → `app/services/` (Ch 6–7).
 
 ---
 
@@ -138,11 +128,9 @@ active rows in SQLite. This single rule has big consequences:
 return an answer on its own; it returns *where* the answer is.
 
 > **Footnotes**
-> [1] ***Derived artifact*** = something computed from a source of truth, like a
-> compiled binary from source code. You never edit it by hand; you regenerate it.
-> [2] The retrieval code re-checks each hit against SQLite and skips any FAQ that is
-> missing or deactivated. See `SemanticSearch.search` in
-> [search.py](../../app/retrieval/search.py) — covered in Chapter 6.
+>
+> - **[1]** ***Derived artifact*** = something computed from a source of truth, like a compiled binary from source code. You never edit it by hand; you regenerate it.
+> - **[2]** The retrieval code re-checks each hit against SQLite and skips any FAQ that is missing or deactivated. See `SemanticSearch.search` in [search.py](../../app/retrieval/search.py) — covered in Chapter 6.
 
 ---
 
@@ -164,14 +152,10 @@ reliable answer," never a made-up one.[2]
 truths.** They must be tuned against *your* data — see Chapter 6 and the footnote.[3]
 
 > **Footnotes**
-> [1] The ***score*** is *cosine similarity*, ranging ~0–1 for this model. 1.0 =
-> identical direction (same meaning); ~0 = unrelated. Chapter 4 explains why.
-> [2] Compare this to a Large Language Model (LLM) that *generates* text: it can
-> produce fluent but false answers. Retrieval-only trades flexibility for safety —
-> the right trade for an FAQ bot. Generation is a possible *future* version.
-> [3] Thresholds depend on your model, your writing style, and how similar your FAQs
-> are to each other. The honest way to set them is empirical: run real questions,
-> read the feedback log, adjust. Never treat a magic number as gospel.
+>
+> - **[1]** The ***score*** is *cosine similarity*, ranging ~0–1 for this model. 1.0 = identical direction (same meaning); ~0 = unrelated. Chapter 4 explains why.
+> - **[2]** Compare this to a Large Language Model (LLM) that *generates* text: it can produce fluent but false answers. Retrieval-only trades flexibility for safety — the right trade for an FAQ bot. Generation is a possible *future* version.
+> - **[3]** Thresholds depend on your model, your writing style, and how similar your FAQs are to each other. The honest way to set them is empirical: run real questions, read the feedback log, adjust. Never treat a magic number as gospel.
 
 ---
 
@@ -188,16 +172,10 @@ The architecture is *designed* so these can be added later (document ingestion,
 RAG, a local LLM, an API, Docker) — but adding them now would be premature.[3]
 
 > **Footnotes**
-> [1] "Simple → Correct → Tested → Maintainable → Extensible" is the project's
-> priority order. Every "no" above is an application of it.
-> [2] ***Chroma*** is a vector database that bundles storage + search. It shines for
-> large document/RAG systems. For a curated FAQ set, keeping SQLite and FAISS
-> separate makes the data flow easy to *see* — which is exactly what a learner
-> needs. It's an easy future swap behind the retrieval layer. The full answer to
-> *"why not Chroma?"* is [Appendix A of Chapter 5](05-faiss-and-the-index.md).
-> [3] ***RAG*** = Retrieval-Augmented Generation: retrieve relevant text, then let an
-> LLM write an answer grounded in it. That's a natural Version 4. The clean service
-> seam in Chapter 6 is where it would plug in.
+>
+> - **[1]** "Simple → Correct → Tested → Maintainable → Extensible" is the project's priority order. Every "no" above is an application of it.
+> - **[2]** ***Chroma*** is a vector database that bundles storage + search. It shines for large document/RAG systems. For a curated FAQ set, keeping SQLite and FAISS separate makes the data flow easy to *see* — which is exactly what a learner needs. It's an easy future swap behind the retrieval layer. The full answer to *"why not Chroma?"* is [Appendix A of Chapter 5](05-faiss-and-the-index.md).
+> - **[3]** ***RAG*** = Retrieval-Augmented Generation: retrieve relevant text, then let an LLM write an answer grounded in it. That's a natural Version 4. The clean service seam in Chapter 6 is where it would plug in.
 
 ---
 

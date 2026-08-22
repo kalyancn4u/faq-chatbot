@@ -26,11 +26,9 @@ This is why we need two tools: something to **remember** data across reruns
 (`cache_resource`).
 
 > **Footnotes**
-> [1] ***Streamlit*** turns Python into a web app with no HTML/JS required —
-> `st.write`, `st.button`, `st.chat_input`, etc. See docs.streamlit.io.
-> [2] It feels wasteful but is what makes Streamlit simple: your script always
-> describes the *current* screen as a function of the *current* state. No callbacks,
-> no manual DOM updates.
+>
+> - **[1]** ***Streamlit*** turns Python into a web app with no HTML/JS required — `st.write`, `st.button`, `st.chat_input`, etc. See docs.streamlit.io.
+> - **[2]** It feels wasteful but is what makes Streamlit simple: your script always describes the *current* screen as a function of the *current* state. No callbacks, no manual DOM updates.
 
 ---
 
@@ -60,12 +58,9 @@ session.[1] So the model loads once, the index is built once, and the chat stays
 instant.[2]
 
 > **Footnotes**
-> [1] ***`st.cache_resource`*** is for global, non-serializable resources (models,
-> DB connections, clients). Its sibling `st.cache_data` is for *data* results (it
-> copies them). Using the right one matters: you want *one shared* IndexManager, not
-> a copy per call.
-> [2] `bootstrap()` also self-heals: on first launch it creates the schema and builds
-> the index if needed, so a new user gets a working chat with no manual step.
+>
+> - **[1]** ***`st.cache_resource`*** is for global, non-serializable resources (models, DB connections, clients). Its sibling `st.cache_data` is for *data* results (it copies them). Using the right one matters: you want *one shared* IndexManager, not a copy per call.
+> - **[2]** `bootstrap()` also self-heals: on first launch it creates the schema and builds the index if needed, so a new user gets a working chat with no manual step.
 
 ---
 
@@ -87,12 +82,9 @@ store the **raw `AnswerResult`** (not pre-formatted text), which is why switchin
 reply channel reformats the *whole* conversation instantly.[2]
 
 > **Footnotes**
-> [1] ***`st.session_state`*** = a dict-like store scoped to one browser session.
-> `setdefault` initializes it once. `st.rerun()` triggers an immediate re-execution
-> so new state is reflected right away.
-> [2] Storing the *result* and formatting at *display* time (Chapter 7) is the key
-> design choice behind instant channel switching — a small decision with a big UX
-> payoff.
+>
+> - **[1]** ***`st.session_state`*** = a dict-like store scoped to one browser session. `setdefault` initializes it once. `st.rerun()` triggers an immediate re-execution so new state is reflected right away.
+> - **[2]** Storing the *result* and formatting at *display* time (Chapter 7) is the key design choice behind instant channel switching — a small decision with a big UX payoff.
 
 ---
 
@@ -110,9 +102,8 @@ The UI is layered like the rest of the app:
 Each page **calls services** (Chapter 6/7); it contains no SQL and no FAISS code.[1]
 
 > **Footnotes**
-> [1] This keeps the UI thin and the logic testable. A page's job is to gather input,
-> call a service, and render the result — nothing more. You could put a different
-> UI (an API, a CLI) on the same services unchanged.
+>
+> - **[1]** This keeps the UI thin and the logic testable. A page's job is to gather input, call a service, and render the result — nothing more. You could put a different UI (an API, a CLI) on the same services unchanged.
 
 ---
 
@@ -137,9 +128,8 @@ Feedback buttons write to the `feedback` table via `FeedbackService`; each turn 
 keyed by its index so clicks don't collide.[1]
 
 > **Footnotes**
-> [1] Widget ***keys*** (e.g. `key=f"fb_yes_{index}"`) must be unique — Streamlit uses
-> them to track widget state across reruns. Reusing a key across turns would make two
-> buttons share state. Indexing by turn number keeps them distinct.
+>
+> - **[1]** Widget ***keys*** (e.g. `key=f"fb_yes_{index}"`) must be unique — Streamlit uses them to track widget state across reruns. Reusing a key across turns would make two buttons share state. Indexing by turn number keeps them distinct.
 
 ---
 
@@ -169,14 +159,10 @@ table uses `table-layout: fixed`, so both **wrap and stay responsive** as the wi
 resizes.[3]
 
 > **Footnotes**
-> [1] `st.markdown(..., unsafe_allow_html=True)` renders HTML. "Unsafe" is a real
-> warning: never pass unescaped user content to it. Here every dynamic value goes
-> through `escape_literal` first.
-> [2] ***HTML-escaping*** converts `<` → `&lt;` etc. so text can't become tags — the
-> basic defense against cross-site scripting (XSS).
-> [3] These CSS choices (`pre-wrap`, `overflow-wrap:anywhere`, `table-layout:fixed`)
-> are what make long replies and long questions flow to the window width instead of
-> overflowing sideways. Verified with unit tests on the pure HTML builders.
+>
+> - **[1]** `st.markdown(..., unsafe_allow_html=True)` renders HTML. "Unsafe" is a real warning: never pass unescaped user content to it. Here every dynamic value goes through `escape_literal` first.
+> - **[2]** ***HTML-escaping*** converts `<` → `&lt;` etc. so text can't become tags — the basic defense against cross-site scripting (XSS).
+> - **[3]** These CSS choices (`pre-wrap`, `overflow-wrap:anywhere`, `table-layout:fixed`) are what make long replies and long questions flow to the window width instead of overflowing sideways. Verified with unit tests on the pure HTML builders.
 
 ---
 
@@ -195,9 +181,8 @@ rule: **make destructive actions safe.**[1]
 invariant (Chapter 5) shown live.
 
 > **Footnotes**
-> [1] Guardrails on irreversible actions are a usability *and* safety feature. The
-> admin isn't expected to know ML; the workflow is simply "edit FAQs → rebuild →
-> they're searchable."
+>
+> - **[1]** Guardrails on irreversible actions are a usability *and* safety feature. The admin isn't expected to know ML; the workflow is simply "edit FAQs → rebuild → they're searchable."
 
 ---
 

@@ -30,11 +30,9 @@ Every arrow you learned in Chapter 1 just executed. If you can narrate these ten
 steps, you understand the system.[2]
 
 > **Footnotes**
-> [1] The two "design laws" both appear here: step 6 fetches truth from SQLite (Law
-> #1), and step 7's threshold gate is what would send a *weak* match to a fallback
-> instead (Law #2).
-> [2] Notice how thin each layer is. No single file is doing everything — which is
-> exactly why you *can* hold the whole flow in your head.
+>
+> - **[1]** The two "design laws" both appear here: step 6 fetches truth from SQLite (Law #1), and step 7's threshold gate is what would send a *weak* match to a fallback instead (Law #2).
+> - **[2]** Notice how thin each layer is. No single file is doing everything — which is exactly why you *can* hold the whole flow in your head.
 
 ---
 
@@ -54,9 +52,8 @@ Same machinery, opposite outcome — and **no hallucination**. The only differen
 which side of the threshold the score lands on.[1]
 
 > **Footnotes**
-> [1] Sit with this: the *entire* safety guarantee of V1 is "compare a number to a
-> threshold and return canned text if it's too low." Simple mechanisms, rigorously
-> applied, beat complex ones you can't reason about.
+>
+> - **[1]** Sit with this: the *entire* safety guarantee of V1 is "compare a number to a threshold and return canned text if it's too low." Simple mechanisms, rigorously applied, beat complex ones you can't reason about.
 
 ---
 
@@ -98,9 +95,8 @@ Learn by changing it. Each project names the files you'd touch:[1]
    confidence gate)*
 
 > **Footnotes**
-> [1] Notice how the architecture makes each project *local*: a change lands in one or
-> two files because responsibilities are separated. If a "small" change forces edits
-> everywhere, that's a design smell — not the case here, by design.
+>
+> - **[1]** Notice how the architecture makes each project *local*: a change lands in one or two files because responsibilities are separated. If a "small" change forces edits everywhere, that's a design smell — not the case here, by design.
 
 ---
 
@@ -117,9 +113,8 @@ If you can answer all of these without looking, you've reached mastery:[1]
 7. Why do we test "paraphrase closer than unrelated" instead of an exact score?
 
 > **Footnotes**
-> [1] Struggling with one? It names the chapter to revisit: 1→Ch5/1, 2→Ch4, 3→Ch5,
-> 4→Ch6, 5→Ch7/8, 6→Ch7, 7→Ch9. Teaching a concept to someone else is the final
-> test of understanding — try explaining #4 aloud.
+>
+> - **[1]** Struggling with one? It names the chapter to revisit: 1→Ch5/1, 2→Ch4, 3→Ch5, 4→Ch6, 5→Ch7/8, 6→Ch7, 7→Ch9. Teaching a concept to someone else is the final test of understanding — try explaining #4 aloud.
 
 ---
 
@@ -135,9 +130,8 @@ This codebase is small, but the ideas generalize:[1]
 - **Simple → Correct → Tested → Maintainable → Extensible** — in that order.
 
 > **Footnotes**
-> [1] These aren't specific to chatbots. They're how you keep *any* system
-> understandable as it grows. The best code is not the cleverest — it's the code the
-> next person (often future-you) can reason about.
+>
+> - **[1]** These aren't specific to chatbots. They're how you keep *any* system understandable as it grows. The best code is not the cleverest — it's the code the next person (often future-you) can reason about.
 
 ---
 

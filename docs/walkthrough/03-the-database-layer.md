@@ -25,11 +25,9 @@ server** to install or run.[1] For a local-first app it is close to ideal:
 Recall Design Law #1: this is the truth; FAISS is rebuilt from it.[2]
 
 > **Footnotes**
-> [1] Contrast with client-server databases (PostgreSQL, MySQL) that need a running
-> service. SQLite is embedded *in* your process. It's the most deployed database in
-> the world — it's in your phone and browser. See sqlite.org.
-> [2] Keeping *structured, authoritative* data in SQL and *semantic search* in FAISS
-> is a clean division of labor: each tool does what it's best at.
+>
+> - **[1]** Contrast with client-server databases (PostgreSQL, MySQL) that need a running service. SQLite is embedded *in* your process. It's the most deployed database in the world — it's in your phone and browser. See sqlite.org.
+> - **[2]** Keeping *structured, authoritative* data in SQL and *semantic search* in FAISS is a clean division of labor: each tool does what it's best at.
 
 ---
 
@@ -55,11 +53,9 @@ Two easy-to-miss but crucial lines:
   you must switch it on *per connection*.[2]
 
 > **Footnotes**
-> [1] Positional access (`row[1]`) silently breaks the moment a column is added or
-> reordered. Name access is self-documenting and robust.
-> [2] A ***foreign key*** links a row in one table to a row in another (e.g. feedback
-> → the FAQ it's about). "Enforce" means the database rejects orphaned links. It's
-> off by default in SQLite for historical compatibility — a classic gotcha.
+>
+> - **[1]** Positional access (`row[1]`) silently breaks the moment a column is added or reordered. Name access is self-documenting and robust.
+> - **[2]** A ***foreign key*** links a row in one table to a row in another (e.g. feedback → the FAQ it's about). "Enforce" means the database rejects orphaned links. It's off by default in SQLite for historical compatibility — a classic gotcha.
 
 ---
 
@@ -92,9 +88,8 @@ This guarantees a **transaction**[1]: either all the writes in the block succeed
 together, or none do. You cannot forget to commit or leak a connection.
 
 > **Footnotes**
-> [1] A ***transaction*** is an all-or-nothing unit of work. If the block raises
-> halfway, `rollback()` restores the database to its pre-block state — no
-> half-written data. `finally` runs no matter what, so the file is always closed.
+>
+> - **[1]** A ***transaction*** is an all-or-nothing unit of work. If the block raises halfway, `rollback()` restores the database to its pre-block state — no half-written data. `finally` runs no matter what, so the file is always closed.
 
 ---
 
@@ -126,16 +121,11 @@ The `feedback` and `unanswered_questions` tables follow the same care, including
 foreign key with `ON DELETE CASCADE`.[4]
 
 > **Footnotes**
-> [1] Semantic paraphrases ("I forgot my password") are *different* rows on purpose —
-> each becomes its own searchable anchor (Chapter 5). Only *identical* text is
-> blocked.
-> [2] A ***constraint*** is a rule the database enforces on every write. `CHECK`
-> rejects invalid values before they can corrupt your data.
-> [3] `["password","login"]` is stored as text and parsed back to a Python list by
-> the repository. A separate tags table would be premature for V1.
-> [4] `ON DELETE CASCADE` means "if an FAQ is hard-deleted, delete its feedback
-> too," so no orphaned rows remain. The schema is `IF NOT EXISTS`, i.e.
-> ***idempotent*** — safe to run on every startup.
+>
+> - **[1]** Semantic paraphrases ("I forgot my password") are *different* rows on purpose — each becomes its own searchable anchor (Chapter 5). Only *identical* text is blocked.
+> - **[2]** A ***constraint*** is a rule the database enforces on every write. `CHECK` rejects invalid values before they can corrupt your data.
+> - **[3]** `["password","login"]` is stored as text and parsed back to a Python list by the repository. A separate tags table would be premature for V1.
+> - **[4]** `ON DELETE CASCADE` means "if an FAQ is hard-deleted, delete its feedback too," so no orphaned rows remain. The schema is `IF NOT EXISTS`, i.e. ***idempotent*** — safe to run on every startup.
 
 ---
 
@@ -168,12 +158,10 @@ Benefits:
   request can group several writes into one commit.[3]
 
 > **Footnotes**
-> [1] The ***repository pattern*** puts all persistence logic behind a small, typed
-> interface. Swap SQLite for something else later and only repositories change.
-> [2] Compare to SQL strings sprinkled through button handlers — impossible to audit
-> for correctness or security.
-> [3] This design also makes tests trivial: pass an in-memory connection and the
-> repository works unchanged (Chapter 9).
+>
+> - **[1]** The ***repository pattern*** puts all persistence logic behind a small, typed interface. Swap SQLite for something else later and only repositories change.
+> - **[2]** Compare to SQL strings sprinkled through button handlers — impossible to audit for correctness or security.
+> - **[3]** This design also makes tests trivial: pass an in-memory connection and the repository works unchanged (Chapter 9).
 
 ---
 
@@ -202,9 +190,8 @@ treats it strictly as data.[1]
 literal with placeholders.
 
 > **Footnotes**
-> [1] ***SQL injection*** is when attacker-supplied text is executed as SQL.
-> ***Parameterized queries*** (a.k.a. prepared statements) separate code from data so
-> injection is impossible by construction. This is non-negotiable in real software.
+>
+> - **[1]** ***SQL injection*** is when attacker-supplied text is executed as SQL. ***Parameterized queries*** (a.k.a. prepared statements) separate code from data so injection is impossible by construction. This is non-negotiable in real software.
 
 ---
 
@@ -228,9 +215,8 @@ Only `is_active = 1` rows are indexed — this is the exact set FAISS is built f
 (Chapter 5).
 
 > **Footnotes**
-> [1] ***Soft-delete*** = mark as removed instead of erasing. It's reversible,
-> preserves referential history, and prevents "why did this feedback vanish?"
-> surprises. Hard delete stays available for genuine purges.
+>
+> - **[1]** ***Soft-delete*** = mark as removed instead of erasing. It's reversible, preserves referential history, and prevents "why did this feedback vanish?" surprises. Hard delete stays available for genuine purges.
 
 ---
 
@@ -254,12 +240,9 @@ def import_faqs_from_csv(conn, csv_path) -> ImportResult:
 second run reports 30 duplicates skipped — proof the guard works.
 
 > **Footnotes**
-> [1] Returning a structured `ImportResult` (inserted / skipped_duplicate /
-> skipped_invalid / errors) lets callers show a friendly summary instead of a stack
-> trace. Robustness for messy real-world CSVs.
-> [2] The logic lives in `app/database/csv_import.py`; the script and the admin
-> service both import it. "One source of truth" applies to *behavior*, not just
-> config.
+>
+> - **[1]** Returning a structured `ImportResult` (inserted / skipped_duplicate / skipped_invalid / errors) lets callers show a friendly summary instead of a stack trace. Robustness for messy real-world CSVs.
+> - **[2]** The logic lives in `app/database/csv_import.py`; the script and the admin service both import it. "One source of truth" applies to *behavior*, not just config.
 
 ---
 

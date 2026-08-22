@@ -24,11 +24,9 @@ Keeping "find candidates" separate from "decide what to do" makes each easy to t
 and reason about.[2]
 
 > **Footnotes**
-> [1] ***Hydrate*** = fill a bare reference with full data. FAISS gives `(faq_id,
-> score)`; the search layer looks each id up in SQLite to attach the question,
-> answer, and category.
-> [2] This is the ***service layer*** pattern: business decisions live in a service,
-> not in the UI and not in the database code. The UI just calls `answer_question`.
+>
+> - **[1]** ***Hydrate*** = fill a bare reference with full data. FAISS gives `(faq_id, score)`; the search layer looks each id up in SQLite to attach the question, answer, and category.
+> - **[2]** This is the ***service layer*** pattern: business decisions live in a service, not in the UI and not in the database code. The UI just calls `answer_question`.
 
 ---
 
@@ -54,9 +52,8 @@ deactivated FAQ, we never surface it, because the answer comes from SQLite, not
 FAISS.[1]
 
 > **Footnotes**
-> [1] This is Design Law #1 doing real work. FAISS is only a *hint* about where to
-> look; SQLite has the final say on what exists and is active. A slightly stale index
-> can never leak a removed answer.
+>
+> - **[1]** This is Design Law #1 doing real work. FAISS is only a *hint* about where to look; SQLite has the final say on what exists and is active. A slightly stale index can never leak a removed answer.
 
 ---
 
@@ -82,11 +79,9 @@ Whatever happens — great match, weak match, no index, empty input — the UI r
 **the same type** and renders it uniformly.[2]
 
 > **Footnotes**
-> [1] Returning a rich, typed result (instead of a bare string) means the UI can show
-> confidence, alternatives, and diagnostics without guessing. It's also a stable
-> contract other channels/APIs can build on.
-> [2] Using an ***enum*** for `status` and `confidence_level` makes the possible values
-> explicit and typo-proof, versus passing around loose strings.
+>
+> - **[1]** Returning a rich, typed result (instead of a bare string) means the UI can show confidence, alternatives, and diagnostics without guessing. It's also a stable contract other channels/APIs can build on.
+> - **[2]** Using an ***enum*** for `status` and `confidence_level` makes the possible values explicit and typo-proof, versus passing around loose strings.
 
 ---
 
@@ -115,9 +110,8 @@ search error all become an `ERROR` *result*, so the UI has exactly one thing to
 render.[1]
 
 > **Footnotes**
-> [1] Turning expected failures into structured results (not exceptions) is a
-> deliberate choice at a boundary the UI depends on. Truly unexpected bugs are logged
-> via `logger.exception` and still return a safe, generic message to the user.
+>
+> - **[1]** Turning expected failures into structured results (not exceptions) is a deliberate choice at a boundary the UI depends on. Truly unexpected bugs are logged via `logger.exception` and still return a safe, generic message to the user.
 
 ---
 
@@ -145,8 +139,8 @@ return AnswerResult(..., status=ANSWER_FOUND, answer=best.answer,
 | **Low** | weak match | fallback + suggestions; **logged** for review |
 
 > **Footnotes**
-> Both thresholds come from `settings` (Chapter 2), so they're tunable without code
-> changes. The order matters: check High first, then Medium, else Low.
+>
+> - Both thresholds come from `settings` (Chapter 2), so they're tunable without code changes. The order matters: check High first, then Medium, else Low.
 
 ---
 
@@ -164,12 +158,9 @@ So the worst case is an honest "I don't know," never a confidently wrong answer.
 This is the whole safety argument for a retrieval-only V1.[2]
 
 > **Footnotes**
-> [1] Contrast with returning `candidates[0].answer` unconditionally — the classic
-> bug where a bot answers *everything*, including nonsense, because there's always a
-> "nearest" match. The threshold is what prevents this.
-> [2] A generation-based bot (LLM) can still be made safe, but it requires extra
-> guardrails. Retrieval-only gets safety *by construction*: it can only ever return
-> text a human wrote.
+>
+> - **[1]** Contrast with returning `candidates[0].answer` unconditionally — the classic bug where a bot answers *everything*, including nonsense, because there's always a "nearest" match. The threshold is what prevents this.
+> - **[2]** A generation-based bot (LLM) can still be made safe, but it requires extra guardrails. Retrieval-only gets safety *by construction*: it can only ever return text a human wrote.
 
 ---
 
@@ -194,9 +185,8 @@ the try/except keeps the user's reply flowing.
 Unanswered** to see it captured with its best score.
 
 > **Footnotes**
-> [1] This is how the system gets better without any machine learning retraining:
-> real gaps are surfaced as data, a human fills them, a rebuild makes them
-> searchable. Simple, transparent, effective.
+>
+> - **[1]** This is how the system gets better without any machine learning retraining: real gaps are surfaced as data, a human fills them, a rebuild makes them searchable. Simple, transparent, effective.
 
 ---
 

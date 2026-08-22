@@ -53,24 +53,30 @@ Each chapter is a mini‑presentation. Per **chapter**:
 Per **slide** keep it to *one idea*:
 
 - an `## H2` slide title,
-- a little prose,
+- a short lead sentence,
+- **bullets for the enumerable points** (keep prose only for connective logic — bullet
+  *where apt*, don't fragment an argument that needs to be sentences),
 - **one** short code excerpt (illustrative, trimmed),
-- optionally a small table or list,
+- optionally a small table,
 - a **Footnotes** block appended at the bottom (see below).
 
 ### Footnotes on every slide (the "citation layer")
 
-Reference notes inline as `[1]`, `[2]`, and end the slide with a blockquote:
+Reference notes inline as `[1]`, `[2]`, and end the slide with a blockquote whose
+**each reference is its own bullet** — scannable, and it flows to the full width:
 
 ```markdown
 Main point with a nuance.[1]
 
 > **Footnotes**
-> [1] Define the jargon, explain the *why*, note a pitfall, or point to further reading.
+>
+> - **[1]** Define the jargon, explain the *why*, note a pitfall, or point to further reading.
+> - **[2]** …
 ```
 
 Footnotes are where the depth lives. Style them as a **quiet, subordinate band** (§4) so
-they never compete with the body.
+they never compete with the body. (A small script can convert `> [n] …` blocks to this
+bulleted form in bulk — see `footnotes_to_bullets.py` in the commit history.)
 
 ### Authoring conventions that pay off
 
@@ -102,14 +108,19 @@ citations, contained code/tables, consistent rhythm. It lives in one file,
 | Element | Rule |
 |--------|------|
 | Slide size | **Taller than 16:9** (1280×940) → more vertical room for dense slides |
-| Type scale | title (h2 ~27) > body (~20) > code/table (~13.5–15) > citations (~13.5) |
-| Title (h2) | bold + a **hairline underline** (`border-bottom`) → a clear title layer |
-| Accent | **one hue**, used sparingly (links, the h2 rule) |
-| Citations | muted colour, **top hairline**, tiny uppercase "FOOTNOTES" label → subordinate |
+| Type scale (large‑room) | **h1 46 › h2 31 › body/li 21 › table 16.5 › code 14.5 › citations 15**px — sized to read from the back of a room; code/table only as small as they must be to fit |
+| **Contrast (WCAG 2.2 AA)** | every text colour ≥ **4.5:1** on white (large text ≥3:1). Secondary greys darkened accordingly (a `#8a929c` label at 3.2:1 **fails** — use ≥`#5b6570`) |
+| Title (h2) | bold + a **hairline underline** → a clear title layer |
+| Accent | **one hue** (links, the h2 rule, list bullets, footnote `[n]` refs) |
+| Citations | **top hairline** + tiny uppercase "FOOTNOTES" label; each reference is its **own bullet** with the `[n]` in the accent colour |
 | Code | a **card**: subtle background + 1px border + radius; inline code as chips |
 | Tables | clean header rule + subtle zebra striping |
-| Placement | `justify-content: center` → balanced vertical rhythm, no lopsided gaps |
-| Safety | `overflow: hidden` on the section as a last resort (nothing should reach it) |
+| Placement | `justify-content: center` → balanced vertical rhythm |
+| Safety | `overflow: hidden` on the section as a last resort |
+
+**Big fonts + bulleting go together:** larger type costs vertical room; converting prose to
+bullets (shorter lines, fewer words) *buys it back*. Do both, then measure. For an unusually
+dense slide, a scoped `<!-- _class: dense -->` (smaller code + citations) is the escape hatch.
 
 **Overflow discipline** — Marp slides are a *fixed* size, so dense content overflows the
 white area. Defend against it:

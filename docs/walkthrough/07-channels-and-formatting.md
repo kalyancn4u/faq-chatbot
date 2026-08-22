@@ -27,11 +27,9 @@ Ignore these and a WhatsApp reply shows literal `**`, an SMS costs double, and a
 Telegram send is **rejected**.[2]
 
 > **Footnotes**
-> [1] This separates *what to say* (Chapter 6) from *how to write it here*. The answer
-> is decided once; formatting is a pure transformation on top.
-> [2] Telegram's API validates MarkdownV2 strictly; an unescaped `.` makes the whole
-> send fail. SMS is billed per 160-character *segment*. These are real constraints,
-> not style preferences.
+>
+> - **[1]** This separates *what to say* (Chapter 6) from *how to write it here*. The answer is decided once; formatting is a pure transformation on top.
+> - **[2]** Telegram's API validates MarkdownV2 strictly; an unescaped `.` makes the whole send fail. SMS is billed per 160-character *segment*. These are real constraints, not style preferences.
 
 ---
 
@@ -61,11 +59,9 @@ optionally add confidence + related list → join → truncate. The logic never 
 when you add a channel.[2]
 
 > **Footnotes**
-> [1] This is *data-driven design* (a.k.a. a strategy table): behavior lives in data,
-> not in a growing chain of conditionals. Adding a channel is adding a row, not
-> editing logic — fewer places to break.
-> [2] `prepare` and `bold` are **functions stored in a field** (Python treats
-> functions as values). Each channel plugs in its own text-cleaning and bold style.
+>
+> - **[1]** This is *data-driven design* (a.k.a. a strategy table): behavior lives in data, not in a growing chain of conditionals. Adding a channel is adding a row, not editing logic — fewer places to break.
+> - **[2]** `prepare` and `bold` are **functions stored in a field** (Python treats functions as values). Each channel plugs in its own text-cleaning and bold style.
 
 ---
 
@@ -94,11 +90,9 @@ def _sms_segments(length):
 ```
 
 > **Footnotes**
-> [1] On SMS every character costs money in segments, so the kindest reply is the
-> answer alone. This is a *product* decision encoded as config (`include_* = False`).
-> [2] A single SMS holds 160 GSM-7 characters; longer messages split into 153-char
-> segments (7 chars go to joining headers). The app shows the segment count so you
-> see the real cost.
+>
+> - **[1]** On SMS every character costs money in segments, so the kindest reply is the answer alone. This is a *product* decision encoded as config (`include_* = False`).
+> - **[2]** A single SMS holds 160 GSM-7 characters; longer messages split into 153-char segments (7 chars go to joining headers). The app shows the segment count so you see the real cost.
 
 ---
 
@@ -122,12 +116,9 @@ strips them and renders clean prose.[2]
 silently fail. The formatter does it for you via each channel's `prepare`.
 
 > **Footnotes**
-> [1] ***MarkdownV2*** is Telegram's strict markdown dialect (chosen with
-> `parse_mode="MarkdownV2"` when actually sending). It's stricter than the "legacy"
-> Markdown precisely so rendering is unambiguous.
-> [2] The bold *labels* (e.g. `*Confidence:*`) are plain ASCII, safe to bold without
-> escaping; only the dynamic content is escaped. That's why the formatter separates
-> `bold(label)` from `prepare(text)`.
+>
+> - **[1]** ***MarkdownV2*** is Telegram's strict markdown dialect (chosen with `parse_mode="MarkdownV2"` when actually sending). It's stricter than the "legacy" Markdown precisely so rendering is unambiguous.
+> - **[2]** The bold *labels* (e.g. `*Confidence:*`) are plain ASCII, safe to bold without escaping; only the dynamic content is escaped. That's why the formatter separates `bold(label)` from `prepare(text)`.
 
 ---
 
@@ -155,9 +146,8 @@ One function, driven entirely by the channel's `spec`. The returned
 it was truncated — so the UI can show it for verification.[1]
 
 > **Footnotes**
-> [1] Returning metadata (not just the string) is what lets the chat window show
-> "134 characters / 160 · 1 SMS segment(s)". Designing outputs to carry the
-> information the *next* layer needs is a recurring theme in this codebase.
+>
+> - **[1]** Returning metadata (not just the string) is what lets the chat window show "134 characters / 160 · 1 SMS segment(s)". Designing outputs to carry the information the *next* layer needs is a recurring theme in this codebase.
 
 ---
 
@@ -176,10 +166,8 @@ sidebar between Chat/WhatsApp/Telegram/SMS. The *same* answer reformats instantl
 because formatting happens at display time from the stored result.
 
 > **Footnotes**
-> [1] Add a matching test in `tests/test_formatting.py` to lock in the new channel's
-> behavior. In V1 this layer *formats and previews*; actually sending (Telegram Bot
-> API, an SMS gateway) is a future version — but `escape_markdown_v2` and the clean
-> `format_reply` seam are already the right building blocks.
+>
+> - **[1]** Add a matching test in `tests/test_formatting.py` to lock in the new channel's behavior. In V1 this layer *formats and previews*; actually sending (Telegram Bot API, an SMS gateway) is a future version — but `escape_markdown_v2` and the clean `format_reply` seam are already the right building blocks.
 
 ---
 

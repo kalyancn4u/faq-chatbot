@@ -24,9 +24,9 @@ FAISS knows only about **vectors and their positions** (row 0, row 1, …). It d
 (coming up) exists precisely to bridge this gap.[2]
 
 > **Footnotes**
-> [1] ***FAISS*** = Facebook AI Similarity Search, a C++/Python library for fast
-> similarity search over dense vectors. See faiss.ai. We use `faiss-cpu` (no GPU).
-> [2] This is the crux of Design Law #1: FAISS finds *where*; SQLite holds *what*.
+>
+> - **[1]** ***FAISS*** = Facebook AI Similarity Search, a C++/Python library for fast similarity search over dense vectors. See faiss.ai. We use `faiss-cpu` (no GPU).
+> - **[2]** This is the crux of Design Law #1: FAISS finds *where*; SQLite holds *what*.
 
 ---
 
@@ -50,14 +50,10 @@ and is always correct. Approximate indexes (IVF, HNSW) only pay off at large
 scale.[3]
 
 > **Footnotes**
-> [1] "Flat" means the vectors are stored plainly and scanned exhaustively — a
-> brute-force but exact search. "IP" = inner (dot) product.
-> [2] Scores come back in roughly 0–1 for this model. No conversion needed — the
-> confidence thresholds (Chapter 6) compare directly to these.
-> [3] ***IVF/HNSW*** are approximate methods that trade a little accuracy for speed
-> at millions of vectors. Using them now would add tuning knobs and subtle recall
-> loss for zero benefit — a textbook case of avoiding premature optimization. The
-> `build_index` interface is the seam where they'd slot in later.
+>
+> - **[1]** "Flat" means the vectors are stored plainly and scanned exhaustively — a brute-force but exact search. "IP" = inner (dot) product.
+> - **[2]** Scores come back in roughly 0–1 for this model. No conversion needed — the confidence thresholds (Chapter 6) compare directly to these.
+> - **[3]** ***IVF/HNSW*** are approximate methods that trade a little accuracy for speed at millions of vectors. Using them now would add tuning knobs and subtle recall loss for zero benefit — a textbook case of avoiding premature optimization. The `build_index` interface is the seam where they'd slot in later.
 
 ---
 
@@ -85,10 +81,8 @@ A search result at position `p` maps to `faq_ids[p]`, which we then look up in
 SQLite.[1]
 
 > **Footnotes**
-> [1] Because embeddings and `faq_ids` are built from the same ordered list, position
-> `p` in the index and index `p` in `faq_ids` always refer to the same FAQ. The
-> id map is stored next to the index as JSON, together with the model name and
-> dimension (used for staleness checks).
+>
+> - **[1]** Because embeddings and `faq_ids` are built from the same ordered list, position `p` in the index and index `p` in `faq_ids` always refer to the same FAQ. The id map is stored next to the index as JSON, together with the model name and dimension (used for staleness checks).
 
 ---
 
@@ -115,11 +109,9 @@ If these three ever disagree, the index is broken and the code **refuses to use
 it** rather than returning wrong answers.[2]
 
 > **Footnotes**
-> [1] An ***invariant*** is a condition that must always hold. Checking it turns a
-> silent corruption into a loud, catchable error at the safest moment (before the
-> index goes live).
-> [2] "Fail loud, never silent" again. A wrong-but-quiet index would map a query to
-> the wrong answer — far worse than an obvious error the admin can fix by rebuilding.
+>
+> - **[1]** An ***invariant*** is a condition that must always hold. Checking it turns a silent corruption into a loud, catchable error at the safest moment (before the index goes live).
+> - **[2]** "Fail loud, never silent" again. A wrong-but-quiet index would map a query to the wrong answer — far worse than an obvious error the admin can fix by rebuilding.
 
 ---
 
@@ -144,10 +136,9 @@ pair or the new pair — never a mix.[2]
 index that *looks* present. Temp-then-replace is the standard safe-write recipe.
 
 > **Footnotes**
-> [1] ***Atomic*** = happens completely or not at all, with no observable in-between
-> state. `os.replace` is atomic within one filesystem.
-> [2] The load path also re-validates (`indexed == mapped`) so even a partially
-> written pair is caught rather than trusted.
+>
+> - **[1]** ***Atomic*** = happens completely or not at all, with no observable in-between state. `os.replace` is atomic within one filesystem.
+> - **[2]** The load path also re-validates (`indexed == mapped`) so even a partially written pair is caught rather than trusted.
 
 ---
 
@@ -171,11 +162,9 @@ longer matches the **set of active FAQs**. The UI uses this to prompt a rebuild,
 to build automatically on first launch.[2]
 
 > **Footnotes**
-> [1] Comparing *sorted id sets* catches additions, deletions, and de/reactivations —
-> anything that changes which FAQs should be searchable.
-> [2] For V1 we always do a **full rebuild** on change. For a small/medium set this is
-> simple and correct; incremental add/remove bookkeeping is easy to get subtly wrong
-> and isn't worth it yet.
+>
+> - **[1]** Comparing *sorted id sets* catches additions, deletions, and de/reactivations — anything that changes which FAQs should be searchable.
+> - **[2]** For V1 we always do a **full rebuild** on change. For a small/medium set this is simple and correct; incremental add/remove bookkeeping is easy to get subtly wrong and isn't worth it yet.
 
 ---
 
@@ -199,10 +188,9 @@ def search(self, query, top_k=None):
 live: indexed vectors, mapped ids, and active FAQ count should all match.
 
 > **Footnotes**
-> [1] Separating "no index" (a recoverable state → rebuild) from "bad query" keeps
-> error handling honest and user-friendly.
-> [2] FAISS pads results to `k` with position `-1` and score `-inf` when the index
-> holds fewer than `k` vectors. Filtering `-1` avoids indexing errors.
+>
+> - **[1]** Separating "no index" (a recoverable state → rebuild) from "bad query" keeps error handling honest and user-friendly.
+> - **[2]** FAISS pads results to `k` with position `-1` and score `-inf` when the index holds fewer than `k` vectors. Filtering `-1` avoids indexing errors.
 
 ---
 
@@ -251,13 +239,10 @@ So the real comparison is not "FAISS vs Chroma." It is **"SQLite + FAISS" (two
 focused tools) vs "Chroma" (one bundled tool)**.
 
 > **Footnotes**
-> [1] Getting the *category* right is half of understanding any tooling decision.
-> Comparing a library to a database leads to confused conclusions.
-> [2] Because FAISS can't filter, this project filters a different way: it builds the
-> index only from *active* FAQs and re-checks each hit against SQLite (Chapter 6).
-> [3] ***HNSW*** (Hierarchical Navigable Small World) is a graph-based *approximate*
-> nearest-neighbour method — fast at huge scale, but it can miss the true nearest
-> vector. Contrast our exact `IndexFlatIP`, which never does.
+>
+> - **[1]** Getting the *category* right is half of understanding any tooling decision. Comparing a library to a database leads to confused conclusions.
+> - **[2]** Because FAISS can't filter, this project filters a different way: it builds the index only from *active* FAQs and re-checks each hit against SQLite (Chapter 6).
+> - **[3]** ***HNSW*** (Hierarchical Navigable Small World) is a graph-based *approximate* nearest-neighbour method — fast at huge scale, but it can miss the true nearest vector. Contrast our exact `IndexFlatIP`, which never does.
 
 ---
 
@@ -276,11 +261,9 @@ is what makes the two Design Laws *visible*: SQLite is truth, FAISS is derived, 
 the id-map + consistency invariant tie them together.[2]
 
 > **Footnotes**
-> [1] This reframing is the whole answer in one line: you can't "need" a tool that
-> replaces something you already have working, unless it does the job better *for
-> your situation*. The next slide checks whether it would.
-> [2] A bundled store hides that boundary. For a project whose goal is *learning*,
-> hiding the most important relationship in the system is a real cost.
+>
+> - **[1]** This reframing is the whole answer in one line: you can't "need" a tool that replaces something you already have working, unless it does the job better *for your situation*. The next slide checks whether it would.
+> - **[2]** A bundled store hides that boundary. For a project whose goal is *learning*, hiding the most important relationship in the system is a real cost.
 
 ---
 
@@ -301,11 +284,9 @@ Five concrete reasons, each an application of *Simple → Correct → …*:[1]
    document features would sit idle.[2]
 
 > **Footnotes**
-> [1] Notice none of these is "Chroma is bad." It's a fine tool — just aimed at
-> problems V1 doesn't have. Choosing tools to your *actual* constraints is the skill.
-> [2] ***RAG*** (Retrieval-Augmented Generation) chunks documents, retrieves
-> passages, and has an LLM write a grounded answer. That's a natural later version —
-> and the point where a vector DB starts to pull its weight.
+>
+> - **[1]** Notice none of these is "Chroma is bad." It's a fine tool — just aimed at problems V1 doesn't have. Choosing tools to your *actual* constraints is the skill.
+> - **[2]** ***RAG*** (Retrieval-Augmented Generation) chunks documents, retrieves passages, and has an LLM write a grounded answer. That's a natural later version — and the point where a vector DB starts to pull its weight.
 
 ---
 
@@ -325,10 +306,9 @@ None of these are true for V1 — which is why Chroma is a *deferred* choice, no
 rejected one.[2]
 
 > **Footnotes**
-> [1] A senior engineer states the conditions under which they'd change their mind.
-> If you can't name what would flip the decision, you haven't finished thinking.
-> [2] "Deferred, not rejected" matters: the architecture is *designed* to adopt it
-> later (next slide), so choosing simplicity now costs nothing in the future.
+>
+> - **[1]** A senior engineer states the conditions under which they'd change their mind. If you can't name what would flip the decision, you haven't finished thinking.
+> - **[2]** "Deferred, not rejected" matters: the architecture is *designed* to adopt it later (next slide), so choosing simplicity now costs nothing in the future.
 
 ---
 
@@ -351,9 +331,8 @@ SQLite (truth + metadata) and FAISS (fast exact vector search) — in a form tha
 simpler, exact at this scale, fully local, and transparent enough to learn from.*
 
 > **Footnotes**
-> [1] This is the payoff of the layered design from Chapters 5–6: a big infrastructure
-> swap is contained behind one interface. If swapping the vector store forced changes
-> across the UI and services, that would signal a leaky abstraction — it doesn't here.
+>
+> - **[1]** This is the payoff of the layered design from Chapters 5–6: a big infrastructure swap is contained behind one interface. If swapping the vector store forced changes across the UI and services, that would signal a leaky abstraction — it doesn't here.
 
 ---
 

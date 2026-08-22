@@ -21,11 +21,9 @@ The suite (44+ tests) covers every layer: database, embeddings, index consistenc
 retrieval, confidence, formatting, and the pure UI helpers.[2]
 
 > **Footnotes**
-> [1] This is ***regression testing***: once a behavior is covered, a future edit that
-> breaks it fails a test instead of shipping a bug. Run them with `pytest`.
-> [2] Coverage is chosen by *risk*, not vanity: the consistency invariant and the
-> confidence logic get the most attention because they're where a silent wrong answer
-> could hide.
+>
+> - **[1]** This is ***regression testing***: once a behavior is covered, a future edit that breaks it fails a test instead of shipping a bug. Run them with `pytest`.
+> - **[2]** Coverage is chosen by *risk*, not vanity: the consistency invariant and the confidence logic get the most attention because they're where a silent wrong answer could hide.
 
 ---
 
@@ -54,11 +52,9 @@ Each test gets its **own temp database** — no shared state, no order dependenc
 nothing touches your real `data/` files.[2]
 
 > **Footnotes**
-> [1] A ***fixture*** is requested by putting its name in a test's parameters (e.g.
-> `def test_x(seeded_conn):`). pytest builds it, hands it over, and tears it down
-> after. Fixtures can depend on other fixtures (`seeded_conn` uses `conn`).
-> [2] `tmp_path` is a pytest built-in giving each test a unique temporary directory.
-> Isolation like this is why the suite is reliable and re-runnable.
+>
+> - **[1]** A ***fixture*** is requested by putting its name in a test's parameters (e.g. `def test_x(seeded_conn):`). pytest builds it, hands it over, and tears it down after. Fixtures can depend on other fixtures (`seeded_conn` uses `conn`).
+> - **[2]** `tmp_path` is a pytest built-in giving each test a unique temporary directory. Isolation like this is why the suite is reliable and re-runnable.
 
 ---
 
@@ -79,10 +75,8 @@ def embedder() -> Embedder:
 - The FAISS index for tests is written under `tmp_path`, never the real `data/indexes`.
 
 > **Footnotes**
-> [1] ***Fixture scope*** controls lifetime: `function` (default) rebuilds per test;
-> `session` builds once for the whole run. Loading a transformer per test would make
-> the suite painfully slow — session scope fixes that without sacrificing isolation of
-> the *data* (which stays per-test).
+>
+> - **[1]** ***Fixture scope*** controls lifetime: `function` (default) rebuilds per test; `session` builds once for the whole run. Loading a transformer per test would make the suite painfully slow — session scope fixes that without sacrificing isolation of the *data* (which stays per-test).
 
 ---
 
@@ -107,9 +101,8 @@ The first asserts the **consistency invariant** (Chapter 5) directly; the second
 proves a FAISS position round-trips to the **right** FAQ.[1]
 
 > **Footnotes**
-> [1] There are also tests for the *unhappy paths*: rebuilding with no active FAQs
-> raises, a search with no index raises `IndexNotBuiltError`, and a corrupted id map
-> is detected on load. Testing failure modes is as important as testing success.
+>
+> - **[1]** There are also tests for the *unhappy paths*: rebuilding with no active FAQs raises, a search with no index raises `IndexNotBuiltError`, and a corrupted id map is detected on load. Testing failure modes is as important as testing success.
 
 ---
 
@@ -132,11 +125,9 @@ We check *"paraphrase scores higher than unrelated"* and *"an off-topic query sc
 below the threshold"* — properties that stay true even if exact numbers drift.[2]
 
 > **Footnotes**
-> [1] ***Brittle test*** = one that fails on harmless changes. Pinning exact floats
-> couples your test to a model's internals. When you must compare floats, use a
-> tolerance (`pytest.approx`), as the feedback-score tests do.
-> [2] This is ***property-based thinking***: assert the invariant that must hold
-> ("closer than"), not a specific value. It's the right way to test ML outputs.
+>
+> - **[1]** ***Brittle test*** = one that fails on harmless changes. Pinning exact floats couples your test to a model's internals. When you must compare floats, use a tolerance (`pytest.approx`), as the feedback-score tests do.
+> - **[2]** This is ***property-based thinking***: assert the invariant that must hold ("closer than"), not a specific value. It's the right way to test ML outputs.
 
 ---
 
@@ -161,11 +152,9 @@ and `build_candidates_table_html` were written to take data and return a string 
 so the tests need no Streamlit runtime at all.[2]
 
 > **Footnotes**
-> [1] A ***pure function*** always returns the same output for the same input and
-> changes nothing else. Pure functions are the easiest code to test, cache, and
-> reason about — worth extracting wherever practical.
-> [2] "Design for testability" isn't extra work; it usually *is* good design. Hard-to-
-> test code is often a hint that responsibilities are tangled.
+>
+> - **[1]** A ***pure function*** always returns the same output for the same input and changes nothing else. Pure functions are the easiest code to test, cache, and reason about — worth extracting wherever practical.
+> - **[2]** "Design for testability" isn't extra work; it usually *is* good design. Hard-to- test code is often a hint that responsibilities are tangled.
 
 ---
 
@@ -186,9 +175,8 @@ fallback message *and* that the question was logged. That single test guards Des
 Law #2.
 
 > **Footnotes**
-> [1] In a team setting this runs automatically in ***CI*** (Continuous Integration)
-> on every push, blocking merges that break tests. Locally, `pytest` before committing
-> is the same discipline at human scale.
+>
+> - **[1]** In a team setting this runs automatically in ***CI*** (Continuous Integration) on every push, blocking merges that break tests. Locally, `pytest` before committing is the same discipline at human scale.
 
 ---
 

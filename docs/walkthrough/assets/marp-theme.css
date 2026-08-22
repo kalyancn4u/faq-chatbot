@@ -1,88 +1,87 @@
 /* @theme walkthrough */
 
 /*
- * Walk-through deck theme — minimal, functional, readable.
+ * Walk-through deck theme — minimal, functional, readable at a distance.
  *
- * Design system (see instructions_ppt.md for the rationale):
- *   - ONE accent hue, used sparingly (links, the rule under each slide title).
- *   - A clear type scale: title > body > code/table > citations.
- *   - Citations (the "Footnotes" block) are a distinct, muted, subordinate band.
- *   - Code and tables read as contained objects (subtle card / clean rules).
- *   - Generous but consistent vertical rhythm; content is vertically centred.
- *   - Taller-than-16:9 slides + tight code/table/citation sizes so dense slides
- *     never overflow (verified: 0 overflow across the whole walk-through).
+ * Design system (see instructions_ppt.md):
+ *   - Type scale sized for a LARGE ROOM: big title/body, code/table/citations only
+ *     as small as they must be to fit. Clear steps between tiers.
+ *   - WCAG 2.2 AA contrast: every text colour clears 4.5:1 on white (large text 3:1).
+ *   - ONE accent hue, used sparingly (links, the rule under each title, footnote refs).
+ *   - Citations = a distinct, muted band; each reference is its own bullet.
+ *   - Content is bulleted where it helps; code/tables read as contained objects.
  */
 
 @import 'default';
 
 :root {
-  color-scheme: light;  /* deck is designed light; pin it so the imported theme's
-                           light-dark() tokens never flip to dark (which would put
-                           our fixed dark text on a dark slide). */
-  --ink:    #1f2328;   /* primary text            */
-  --muted:  #5b6570;   /* secondary / citations   */
-  --faint:  #8a929c;   /* labels, markers, footer  */
-  --accent: #3b5bdb;   /* single accent hue        */
-  --rule:   #e4e7eb;   /* hairlines               */
-  --rule-2: #d0d5db;   /* stronger hairline       */
-  --code-bg:#f6f8fa;   /* code / zebra background  */
+  color-scheme: light;   /* pin light so the imported theme's light-dark() tokens
+                            never flip our fixed dark text onto a dark slide. */
+  --ink:    #1f2328;   /* primary text — 15:1 on white                */
+  --muted:  #565d66;   /* citation body — ~5.8:1 on white             */
+  --faint:  #5b6570;   /* labels / markers / footer — ~5.7:1 (WCAG AA) */
+  --accent: #3b5bdb;   /* single accent hue — ~5.7:1                   */
+  --rule:   #d7dbe0;   /* hairlines                                    */
+  --rule-2: #c3c9d0;   /* stronger hairline                            */
+  --code-bg:#f6f8fa;   /* code / zebra background                      */
 }
 
 /* ---------- Slide surface ---------- */
 section {
   width: 1280px;
   height: 940px;               /* taller than 16:9 -> more vertical room */
-  padding: 48px 68px;
-  font-size: 20px;
-  line-height: 1.46;
+  padding: 44px 60px;
+  font-size: 21px;             /* body baseline — legible in a room */
+  line-height: 1.5;
   color: var(--ink);
-  justify-content: center;     /* balanced vertical placement */
-  overflow: hidden;            /* final safety net; nothing should reach it */
+  justify-content: center;
+  overflow: hidden;            /* final safety net */
 }
 
 /* ---------- Headings ---------- */
 h1 {                            /* chapter / title slide */
-  font-size: 40px;
+  font-size: 46px;
   font-weight: 700;
-  letter-spacing: -0.4px;
-  margin: 0 0 .28em;
+  letter-spacing: -0.5px;
+  margin: 0 0 .26em;
 }
 h2 {                            /* slide title */
-  font-size: 27px;
+  font-size: 31px;
   font-weight: 700;
-  letter-spacing: -0.2px;
-  margin: 0 0 .62em;
-  padding-bottom: .26em;
-  border-bottom: 2px solid var(--rule);
+  letter-spacing: -0.3px;
+  margin: 0 0 .55em;
+  padding-bottom: .24em;
+  border-bottom: 2px solid var(--rule-2);
 }
 h3 {
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--muted);
-  margin: .8em 0 .3em;
+  margin: .7em 0 .25em;
 }
 
 /* ---------- Body ---------- */
-p  { margin: .42em 0; }
-ul, ol { margin: .35em 0 .45em 1.05em; padding-left: .4em; }
-li { margin: .2em 0; }
-li::marker { color: var(--faint); }
+p  { margin: .4em 0; }
+ul, ol { margin: .35em 0 .45em 1.1em; padding-left: .35em; }
+li { margin: .28em 0; }
+li::marker { color: var(--accent); }        /* accent bullets tie the deck together */
 strong { font-weight: 700; }
-a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(59, 91, 219, .28); }
+em { color: inherit; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(59, 91, 219, .3); }
 
 /* ---------- Inline & block code ---------- */
 :not(pre) > code {
-  font-size: 0.86em;
+  font-size: 0.9em;
   background: var(--code-bg);
   border: 1px solid var(--rule);
   border-radius: 5px;
   padding: .04em .34em;
 }
 pre {
-  font-size: 13.5px;
-  line-height: 1.42;
+  font-size: 14.5px;
+  line-height: 1.45;
   margin: .5em 0;
-  padding: .6em .8em;
+  padding: .6em .85em;
   background: var(--code-bg);
   border: 1px solid var(--rule);
   border-radius: 8px;
@@ -90,40 +89,51 @@ pre {
 }
 pre code { font-size: inherit; background: none; border: none; padding: 0; }
 
-/* Opt-in tighter code for a slide dominated by one very tall ASCII block.
- * Apply on that slide with:  <!-- _class: diagram-text --> */
-section.diagram-text pre { font-size: 12px; line-height: 1.32; }
+/* Opt-in tighter code for a slide dominated by one very tall block.
+ * Apply with:  <!-- _class: diagram-text --> */
+section.diagram-text pre { font-size: 12.5px; line-height: 1.34; }
+/* Opt-in tighter everything for an unusually dense slide.
+ * Apply with:  <!-- _class: dense --> */
+section.dense { font-size: 19px; }
+section.dense pre { font-size: 13px; }
+section.dense blockquote, section.dense blockquote li { font-size: 13.5px; }
 
 /* ---------- Tables ---------- */
-table { font-size: 15px; border-collapse: collapse; margin: .5em 0; }
-th, td { padding: 5px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+table { font-size: 16.5px; border-collapse: collapse; margin: .5em 0; }
+th, td { padding: 6px 13px; text-align: left; border-bottom: 1px solid var(--rule); }
 thead th { border-bottom: 2px solid var(--rule-2); font-weight: 700; }
 tbody tr:nth-child(even) { background: rgba(27, 31, 36, .025); }
 
 /* ---------- Citations (the "> Footnotes" blockquote) ---------- */
 blockquote {
-  margin: 1em 0 0;
-  padding: .5em 0 0;
+  margin: .85em 0 0;
+  padding: .45em 0 0;
   border: 0;
   border-top: 1px solid var(--rule);   /* subordinate band, separated by a hairline */
   color: var(--muted);
-  font-size: 13.5px;
-  line-height: 1.42;
+  font-size: 15px;
+  line-height: 1.4;
 }
-blockquote p, blockquote li { font-size: 13.5px; margin: .1em 0; color: var(--muted); }
-blockquote strong {                    /* the "Footnotes" label */
+/* The "FOOTNOTES" label — only the first paragraph's strong, not the [n] refs. */
+blockquote > p { margin: 0 0 .15em; }
+blockquote > p strong {
   color: var(--faint);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
-  font-size: 11.5px;
+  letter-spacing: .7px;
+  font-size: 12.5px;
 }
-blockquote code { font-size: .95em; background: rgba(27, 31, 36, .04); border-color: transparent; }
+/* Each reference as its own bullet. */
+blockquote ul { margin: .1em 0 0 1.15em; padding-left: .3em; list-style: disc; }
+blockquote li { font-size: 15px; margin: .16em 0; color: var(--muted); }
+blockquote li::marker { color: var(--faint); font-size: .85em; }
+blockquote li strong { color: var(--accent); font-weight: 700; }   /* the [n] ref */
+blockquote code { font-size: .95em; background: rgba(27, 31, 36, .05); border-color: transparent; }
 blockquote a { color: var(--accent); }
 
 /* ---------- Media ---------- */
 img { max-width: 100%; max-height: 500px; height: auto; }
 
 /* ---------- Chrome: footer + pagination ---------- */
-footer { font-size: 12px; color: var(--faint); opacity: 1; }
-section::after { font-size: 13px; color: var(--faint); }
+footer { font-size: 13px; color: var(--faint); opacity: 1; }
+section::after { font-size: 14px; color: var(--faint); }

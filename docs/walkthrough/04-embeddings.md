@@ -26,11 +26,9 @@ together, even though they share few words.[2]
 ```
 
 > **Footnotes**
-> [1] "Meaning" is learned: the model was trained on huge amounts of text so that
-> semantically related sentences end up nearby in this number space. You don't
-> program the meaning; the model learned it.
-> [2] This number space is often called an ***embedding space*** or *latent space*.
-> Directions in it correspond, roughly, to aspects of meaning.
+>
+> - **[1]** "Meaning" is learned: the model was trained on huge amounts of text so that semantically related sentences end up nearby in this number space. You don't program the meaning; the model learned it.
+> - **[2]** This number space is often called an ***embedding space*** or *latent space*. Directions in it correspond, roughly, to aspects of meaning.
 
 ---
 
@@ -51,12 +49,9 @@ self.model_name = model_name or settings.embedding_model_name
 ```
 
 > **Footnotes**
-> [1] ***sentence-transformers*** (a.k.a. SBERT) is a library of models that embed
-> whole sentences, not just words. See sbert.net. "MiniLM-L6" is a compact
-> 6-layer transformer; "v2" is the version.
-> [2] To support other languages, set `EMBEDDING_MODEL_NAME` to a multilingual model
-> in `.env`. The rest of the code is unchanged — the payoff of centralized config
-> (Chapter 2).
+>
+> - **[1]** ***sentence-transformers*** (a.k.a. SBERT) is a library of models that embed whole sentences, not just words. See sbert.net. "MiniLM-L6" is a compact 6-layer transformer; "v2" is the version.
+> - **[2]** To support other languages, set `EMBEDDING_MODEL_NAME` to a multilingual model in `.env`. The rest of the code is unchanged — the payoff of centralized config (Chapter 2).
 
 ---
 
@@ -73,12 +68,9 @@ Cosine cares about **direction, not length**, which is what we want: the *topic*
 matters, not how long the sentence is.[2]
 
 > **Footnotes**
-> [1] Cosine similarity of vectors **a** and **b** is `(a·b) / (|a||b|)`, where `a·b`
-> is the dot product. If both vectors have length 1, this simplifies to just `a·b` —
-> a fact we exploit next.
-> [2] A long question and a short paraphrase can mean the same thing; cosine treats
-> them as similar because their *direction* agrees. A distance that cared about
-> magnitude would be misled by length.
+>
+> - **[1]** Cosine similarity of vectors **a** and **b** is `(a·b) / (|a||b|)`, where `a·b` is the dot product. If both vectors have length 1, this simplifies to just `a·b` — a fact we exploit next.
+> - **[2]** A long question and a short paraphrase can mean the same thing; cosine treats them as similar because their *direction* agrees. A distance that cared about magnitude would be misled by length.
 
 ---
 
@@ -106,12 +98,9 @@ between Chapters 4 and 5. Normalize here → use `IndexFlatIP` there → get cos
 free.
 
 > **Footnotes**
-> [1] ***L2 normalization*** divides a vector by its length (its L2 norm) so the
-> result has length 1. Geometrically, every point is moved onto the unit sphere;
-> only direction remains.
-> [2] FAISS offers an inner-product index (`IndexFlatIP`). Inner product of unit
-> vectors = cosine. So by normalizing here, we let FAISS compute cosine with its
-> fastest primitive. Chapter 5 uses exactly this.
+>
+> - **[1]** ***L2 normalization*** divides a vector by its length (its L2 norm) so the result has length 1. Geometrically, every point is moved onto the unit sphere; only direction remains.
+> - **[2]** FAISS offers an inner-product index (`IndexFlatIP`). Inner product of unit vectors = cosine. So by normalizing here, we let FAISS compute cosine with its fastest primitive. Chapter 5 uses exactly this.
 
 ---
 
@@ -131,11 +120,9 @@ return np.asarray(vectors, dtype=np.float32)   # shape (n, 384)
 copies. Fixing the dtype *at the source* means no caller has to remember.
 
 > **Footnotes**
-> [1] ***dtype*** = the numeric type of array elements. `float32` uses half the
-> memory of `float64` and is what FAISS is built around. NumPy defaults to
-> `float64`, so we convert explicitly.
-> [2] Keeping a single query 2-D (`(1, 384)`) avoids a whole category of
-> "expected 2-D, got 1-D" bugs at the FAISS boundary.
+>
+> - **[1]** ***dtype*** = the numeric type of array elements. `float32` uses half the memory of `float64` and is what FAISS is built around. NumPy defaults to `float64`, so we convert explicitly.
+> - **[2]** Keeping a single query 2-D (`(1, 384)`) avoids a whole category of "expected 2-D, got 1-D" bugs at the FAISS boundary.
 
 ---
 
@@ -158,13 +145,9 @@ def _load_model(model_name: str):
   module doesn't pull in PyTorch.[2]
 
 > **Footnotes**
-> [1] ***`lru_cache`*** memoizes a function: same arguments → cached result. Here the
-> "result" is the loaded model object, so it loads at most once per model name per
-> process. In the Streamlit UI a second layer (`st.cache_resource`, Chapter 8)
-> keeps it alive across reruns.
-> [2] ***Lazy import*** = import inside the function, not at the top of the file, so
-> the cost is paid only if/when the function actually runs. This keeps tests and
-> tools that don't embed fast to import.
+>
+> - **[1]** ***`lru_cache`*** memoizes a function: same arguments → cached result. Here the "result" is the loaded model object, so it loads at most once per model name per process. In the Streamlit UI a second layer (`st.cache_resource`, Chapter 8) keeps it alive across reruns.
+> - **[2]** ***Lazy import*** = import inside the function, not at the top of the file, so the cost is paid only if/when the function actually runs. This keeps tests and tools that don't embed fast to import.
 
 ---
 
@@ -186,10 +169,8 @@ print(e.encode(["reset password","forgot password"]) @ e.encode(["reset password
 — the two paraphrases score high; an unrelated sentence scores low.
 
 > **Footnotes**
-> [1] This is set in `settings.py` so it takes effect *before* the Hugging Face
-> libraries are imported (they read these variables at import time). A small ordering
-> detail with a big effect on startup speed — see the project README's
-> troubleshooting section.
+>
+> - **[1]** This is set in `settings.py` so it takes effect *before* the Hugging Face libraries are imported (they read these variables at import time). A small ordering detail with a big effect on startup speed — see the project README's troubleshooting section.
 
 ---
 

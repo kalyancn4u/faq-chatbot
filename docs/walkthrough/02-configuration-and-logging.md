@@ -24,9 +24,8 @@ and a value that is *defined* in many places. The first is fine; the second is a
 waiting to happen.
 
 > **Footnotes**
-> [1] These stray constants are called ***magic numbers*** — unexplained literals
-> buried in code. Centralizing them also gives each a name and a docstring, so the
-> *meaning* travels with the value.
+>
+> - **[1]** These stray constants are called ***magic numbers*** — unexplained literals buried in code. Centralizing them also gives each a name and a docstring, so the *meaning* travels with the value.
 
 ---
 
@@ -61,11 +60,9 @@ k = settings.top_k
   mid-run, so behavior can't drift.[2]
 
 > **Footnotes**
-> [1] A ***dataclass*** is a Python class whose fields you declare by name and type;
-> the decorator generates the plumbing. See the stdlib `dataclasses` docs.
-> [2] ***Immutable*** = cannot be changed after creation. Attempting `settings.top_k = 9`
-> raises an error. Immutability is a cheap way to remove a whole class of bugs
-> ("who changed this and when?").
+>
+> - **[1]** A ***dataclass*** is a Python class whose fields you declare by name and type; the decorator generates the plumbing. See the stdlib `dataclasses` docs.
+> - **[2]** ***Immutable*** = cannot be changed after creation. Attempting `settings.top_k = 9` raises an error. Immutability is a cheap way to remove a whole class of bugs ("who changed this and when?").
 
 ---
 
@@ -94,12 +91,10 @@ load_dotenv(PROJECT_ROOT / ".env", override=False)
 the standard precedence.[3]
 
 > **Footnotes**
-> [1] This is a core idea of the ***twelve-factor app***: keep configuration in the
-> environment, separate from code, so the same code runs unchanged in dev and prod.
-> [2] A ***.env file*** is a simple `KEY=value` list, kept out of version control
-> (it's in `.gitignore`) because it may hold machine- or secret-specific values.
-> [3] Precedence (highest first): real env var → `.env` file → built-in default.
-> Predictable precedence is what makes overrides trustworthy.
+>
+> - **[1]** This is a core idea of the ***twelve-factor app***: keep configuration in the environment, separate from code, so the same code runs unchanged in dev and prod.
+> - **[2]** A ***.env file*** is a simple `KEY=value` list, kept out of version control (it's in `.gitignore`) because it may hold machine- or secret-specific values.
+> - **[3]** Precedence (highest first): real env var → `.env` file → built-in default. Predictable precedence is what makes overrides trustworthy.
 
 ---
 
@@ -127,9 +122,8 @@ around gives cryptic errors far from the cause. Centralized, validated getters t
 a confusing runtime crash into an obvious startup error.
 
 > **Footnotes**
-> [1] "Fail fast" is a design principle: detect an invalid state at the earliest,
-> clearest point. `raise ... from exc` preserves the original error for debugging —
-> the *exception chaining* pattern.
+>
+> - **[1]** "Fail fast" is a design principle: detect an invalid state at the earliest, clearest point. `raise ... from exc` preserves the original error for debugging — the *exception chaining* pattern.
 
 ---
 
@@ -154,11 +148,9 @@ def ensure_directories() -> None:      # called explicitly at startup
   side effects**.[2]
 
 > **Footnotes**
-> [1] A ***property*** looks like an attribute but runs code. `settings.index_path`
-> is always `index_dir/faq.faiss`; change the directory and the file follows.
-> [2] A ***side effect*** is anything a piece of code does beyond returning a value
-> (writing files, network calls). Import-time side effects make code hard to test
-> and reason about; keeping imports pure is a deliberate discipline.
+>
+> - **[1]** A ***property*** looks like an attribute but runs code. `settings.index_path` is always `index_dir/faq.faiss`; change the directory and the file follows.
+> - **[2]** A ***side effect*** is anything a piece of code does beyond returning a value (writing files, network calls). Import-time side effects make code hard to test and reason about; keeping imports pure is a deliberate discipline.
 
 ---
 
@@ -179,9 +171,8 @@ The format and level are set in exactly one place, mirroring the config philosop
 silenced globally by changing `LOG_LEVEL`.
 
 > **Footnotes**
-> [1] `__name__` is the module's dotted path (e.g. `app.retrieval.index_manager`),
-> so every log line tells you *where* it came from. A guard flag makes repeated
-> `configure_logging()` calls harmless (idempotent setup).
+>
+> - **[1]** `__name__` is the module's dotted path (e.g. `app.retrieval.index_manager`), so every log line tells you *where* it came from. A guard flag makes repeated `configure_logging()` calls harmless (idempotent setup).
 
 ---
 
