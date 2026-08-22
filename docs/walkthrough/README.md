@@ -49,7 +49,7 @@ them — the footnotes are where the nuance lives.
 | 2 | [Configuration & Logging](02-configuration-and-logging.md) | Why *all* settings live in one place, frozen dataclasses, environment overrides, and consistent logging |
 | 3 | [The Database Layer](03-the-database-layer.md) | SQLite as the source of truth: schema, the repository pattern, parameterized queries, soft-delete, and safe CSV import |
 | 4 | [Embeddings](04-embeddings.md) | What an embedding *is*, cosine similarity, normalization, and why the model is loaded once and cached |
-| 5 | [FAISS & the Index](05-faiss-and-the-index.md) | Vector search, the derived-artifact idea, the FAISS↔SQLite id map, atomic rebuilds, and the consistency invariant |
+| 5 | [FAISS & the Index](05-faiss-and-the-index.md) | Vector search, the derived-artifact idea, the FAISS↔SQLite id map, atomic rebuilds, the consistency invariant — **+ Appendix A: "Why not Chroma?"** |
 | 6 | [Retrieval & Confidence](06-retrieval-and-confidence.md) | The service layer, confidence bands, honest fallbacks, and *why V1 never hallucinates* |
 | 7 | [Channels & Formatting](07-channels-and-formatting.md) | Tailoring one answer to Chat/WhatsApp/Telegram/SMS, MarkdownV2 escaping, and SMS segments |
 | 8 | [The Streamlit UI](08-the-streamlit-ui.md) | Streamlit's rerun model, `cache_resource`, `session_state`, and safe, responsive HTML rendering |

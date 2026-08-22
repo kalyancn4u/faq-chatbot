@@ -179,7 +179,8 @@ RAG, a local LLM, an API, Docker) — but adding them now would be premature.[3]
 > [2] ***Chroma*** is a vector database that bundles storage + search. It shines for
 > large document/RAG systems. For a curated FAQ set, keeping SQLite and FAISS
 > separate makes the data flow easy to *see* — which is exactly what a learner
-> needs. It's an easy future swap behind the retrieval layer.
+> needs. It's an easy future swap behind the retrieval layer. The full answer to
+> *"why not Chroma?"* is [Appendix A of Chapter 5](05-faiss-and-the-index.md).
 > [3] ***RAG*** = Retrieval-Augmented Generation: retrieve relevant text, then let an
 > LLM write an answer grounded in it. That's a natural Version 4. The clean service
 > seam in Chapter 6 is where it would plug in.

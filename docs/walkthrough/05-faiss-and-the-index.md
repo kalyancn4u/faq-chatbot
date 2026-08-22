@@ -211,3 +211,154 @@ live: indexed vectors, mapped ids, and active FAQ count should all match.
 
 **Next:** [Chapter 6 — Retrieval & Confidence](06-retrieval-and-confidence.md):
 turning raw matches into a trustworthy answer — or an honest fallback.
+
+📎 **Bonus:** the appendix below answers a question every reader eventually asks —
+*"why not just use a vector database like Chroma?"*
+
+---
+
+# Appendix A — "Why not Chroma?" (SQLite + FAISS vs a vector database)
+
+*A common, reasonable question — and the answer teaches you how these tools really
+differ.*
+
+**By the end of this appendix you will be able to:** explain why FAISS and Chroma
+are different *kinds* of tool, why SQLite + FAISS is the right choice for Version 1,
+and exactly when a vector database would earn its place.
+
+---
+
+## The category confusion to clear up first
+
+The question "shouldn't we use Chroma?" quietly assumes FAISS and Chroma are the
+same kind of thing. They are not:[1]
+
+- **FAISS is a *library* — an index.** It knows only vectors and positions; it finds
+  nearest neighbours fast. It does **not** store your text or metadata, has no CRUD,
+  and cannot filter by attributes.[2]
+- **Chroma is a *database*.** It bundles a vector index *plus* persistence, document
+  and metadata storage, collections, metadata filtering (`where` clauses), and
+  add/upsert/delete — often behind a client/server API, using **approximate** (HNSW)
+  search underneath.[3]
+
+So the real comparison is not "FAISS vs Chroma." It is **"SQLite + FAISS" (two
+focused tools) vs "Chroma" (one bundled tool)**.
+
+> **Footnotes**
+> [1] Getting the *category* right is half of understanding any tooling decision.
+> Comparing a library to a database leads to confused conclusions.
+> [2] Because FAISS can't filter, this project filters a different way: it builds the
+> index only from *active* FAQs and re-checks each hit against SQLite (Chapter 6).
+> [3] ***HNSW*** (Hierarchical Navigable Small World) is a graph-based *approximate*
+> nearest-neighbour method — fast at huge scale, but it can miss the true nearest
+> vector. Contrast our exact `IndexFlatIP`, which never does.
+
+---
+
+## The key realization
+
+We already have **both halves** of what Chroma offers:
+
+```text
+Chroma  =  vector index      +  document/metadata database
+           └── FAISS does this   └── SQLite does this
+```
+
+Chroma would be a **substitute** for a combination we built deliberately — not a
+missing capability we lack.[1] And building it ourselves from two transparent tools
+is what makes the two Design Laws *visible*: SQLite is truth, FAISS is derived, and
+the id-map + consistency invariant tie them together.[2]
+
+> **Footnotes**
+> [1] This reframing is the whole answer in one line: you can't "need" a tool that
+> replaces something you already have working, unless it does the job better *for
+> your situation*. The next slide checks whether it would.
+> [2] A bundled store hides that boundary. For a project whose goal is *learning*,
+> hiding the most important relationship in the system is a real cost.
+
+---
+
+## Why SQLite + FAISS is right for Version 1
+
+Five concrete reasons, each an application of *Simple → Correct → …*:[1]
+
+1. **Scale doesn't demand it.** With tens-to-thousands of FAQs, exact `IndexFlatIP`
+   returns in well under a millisecond — *more* accurate than approximate search,
+   with nothing to tune. Chroma's strengths (approximate ANN, sharding) go unused.
+2. **Transparency.** You can *see* the source-of-truth vs derived-index split; a
+   bundled DB obscures it.
+3. **Truly local, fewer parts.** No extra dependency or service; one `.db` file and
+   one `.faiss` file, CPU-only.
+4. **SQLite owns the answers.** Authoritative text, constraints, feedback, and logs
+   live in SQL — not tempted into the vector store.
+5. **No document ingestion yet.** There's no PDF chunking or RAG in V1, so Chroma's
+   document features would sit idle.[2]
+
+> **Footnotes**
+> [1] Notice none of these is "Chroma is bad." It's a fine tool — just aimed at
+> problems V1 doesn't have. Choosing tools to your *actual* constraints is the skill.
+> [2] ***RAG*** (Retrieval-Augmented Generation) chunks documents, retrieves
+> passages, and has an LLM write a grounded answer. That's a natural later version —
+> and the point where a vector DB starts to pull its weight.
+
+---
+
+## When a vector database *would* earn its place
+
+Being honest about the trade-off — you'd want Chroma (or similar) when:[1]
+
+- the corpus grows to **hundreds of thousands / millions** of vectors (approximate
+  search becomes worth it);
+- you ingest **documents with chunking** and do **RAG**;
+- you need **metadata filtering combined with vector search at query time** (e.g.
+  "nearest *where* `category = billing`") — FAISS can't do this natively;
+- you want **incremental upserts/deletes** rather than full index rebuilds;
+- you want embeddings + metadata **persisted and managed together** for you.
+
+None of these are true for V1 — which is why Chroma is a *deferred* choice, not a
+rejected one.[2]
+
+> **Footnotes**
+> [1] A senior engineer states the conditions under which they'd change their mind.
+> If you can't name what would flip the decision, you haven't finished thinking.
+> [2] "Deferred, not rejected" matters: the architecture is *designed* to adopt it
+> later (next slide), so choosing simplicity now costs nothing in the future.
+
+---
+
+## Side by side, and the swap-in path
+
+| | **SQLite + FAISS** (chosen) | **Chroma** |
+|---|---|---|
+| Type | database + index (two focused tools) | bundled vector database |
+| Search | **exact** (FlatIP) — perfect recall | approximate (HNSW) |
+| Best at | small/medium, transparent, local | large corpora, RAG, filtered queries |
+| Metadata filtering | via SQLite | native, at query time |
+| Extra service / deps | none | more |
+
+Swapping later is a **one-seam change**: reimplement [`SemanticSearch`](../../app/retrieval/search.py)
+against Chroma; the confidence logic, channels, and UI depend on that interface, not
+on FAISS, so they don't change.[1]
+
+🧠 **In one sentence:** *we don't need Chroma because we already have its two jobs —
+SQLite (truth + metadata) and FAISS (fast exact vector search) — in a form that is
+simpler, exact at this scale, fully local, and transparent enough to learn from.*
+
+> **Footnotes**
+> [1] This is the payoff of the layered design from Chapters 5–6: a big infrastructure
+> swap is contained behind one interface. If swapping the vector store forced changes
+> across the UI and services, that would signal a leaky abstraction — it doesn't here.
+
+---
+
+## Appendix recap
+
+- FAISS is an **index (library)**; Chroma is a **database**. The honest comparison is
+  **SQLite + FAISS vs Chroma**.
+- We already have both of Chroma's jobs, more transparently — so for V1's scale and
+  goals, Chroma would add opacity and dependencies without adding capability.
+- It becomes worth adopting at **large scale, for document RAG, or query-time
+  metadata filtering** — and the retrieval seam is ready for that swap.
+
+**Back to:** [Chapter 5](#chapter-5--faiss--the-index) · **Continue:**
+[Chapter 6 — Retrieval & Confidence](06-retrieval-and-confidence.md).
