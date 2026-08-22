@@ -75,6 +75,8 @@ A plain-text version is on the next slide (screen-reader and terminal friendly).
 
 ## The architecture — text version
 
+<!-- _class: diagram-text -->
+
 *The same flow as the diagram, in plain text:*
 
 ```text

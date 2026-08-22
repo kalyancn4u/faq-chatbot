@@ -2,6 +2,10 @@
 
 > Single source of truth for scope, architecture, and conventions. Read first.
 
+**Related docs:**
+[`docs/walkthrough/`](docs/walkthrough/README.md) — the beginner‑to‑mastery code walk‑through ·
+[`instructions_ppt.md`](instructions_ppt.md) — **how to build a code‑walk‑through presentation from scratch** (structure, the Marp design system, build pipeline, overflow discipline, and publishing).
+
 ---
 
 ## 1. Role
