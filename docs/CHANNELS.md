@@ -137,6 +137,11 @@ segments it *would* have taken.
 > display time*. Change the channel and every message in the conversation
 > re-formats at once — a fast way to confirm all four work.
 
+The preview is shown in a monospace box that **word-wraps and is full-width**, so
+long replies flow onto multiple lines and the box reflows as you resize the
+browser — no sideways scrolling. Every character (including `*` and Telegram's
+`\`) is shown literally, exactly as the channel would receive it.
+
 **Developer mode** (also in the sidebar) adds a diagnostics panel under each
 reply — matched FAQ id, similarity score, and the alternatives table — handy when
 you want to see *why* a certain answer came back.

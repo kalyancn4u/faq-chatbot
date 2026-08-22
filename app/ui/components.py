@@ -9,6 +9,8 @@ an admin rebuild is immediately visible to search.
 
 from __future__ import annotations
 
+import html
+
 import streamlit as st
 
 from app.config.logging_config import get_logger
@@ -51,6 +53,63 @@ def bootstrap() -> bool:
             logger.info("Building FAISS index at startup (%d active FAQs).", active)
             manager.rebuild(conn)
     return True
+
+
+# Markdown-significant characters mapped to numeric HTML entities. Rendering
+# these as entities makes Streamlit's Markdown parser leave them alone (so
+# `*bold*` and Telegram's `\.` show literally), while the browser still displays
+# the intended glyph. Without this, st.markdown would italicize `*...*` and drop
+# backslash escapes — misrepresenting what the channel actually sends.
+_MD_NEUTRALIZE = {
+    "\\": "&#92;",
+    "*": "&#42;",
+    "_": "&#95;",
+    "`": "&#96;",
+    "~": "&#126;",
+    "[": "&#91;",
+    "]": "&#93;",
+}
+
+
+def channel_preview_box(text: str) -> None:
+    """Render channel-formatted text exactly as it would be sent.
+
+    Uses a monospace ``<pre>`` so raw markers (``*bold*``, escaped ``\\.``) show
+    literally, but with ``white-space: pre-wrap`` + word breaking so long lines
+    **wrap** instead of overflowing, and ``width:100%`` so the box is responsive —
+    it reflows as the browser window changes size. Colors use translucent tones
+    so it reads well in both light and dark themes.
+
+    The text is HTML-escaped (``&``, ``<``, ``>``) and its Markdown-significant
+    characters are entity-encoded so every character is shown literally and no
+    markup can be injected.
+    """
+    escaped = html.escape(text, quote=False)
+    for char, entity in _MD_NEUTRALIZE.items():
+        escaped = escaped.replace(char, entity)
+    st.markdown(
+        f"""
+<div style="
+    border:1px solid rgba(128,128,128,0.35);
+    background:rgba(128,128,128,0.10);
+    border-radius:12px;
+    padding:12px 14px;
+    max-width:100%;
+    box-sizing:border-box;
+">
+  <pre style="
+    margin:0;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+    font-size:0.9rem;
+    line-height:1.5;
+  ">{escaped}</pre>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 def confidence_badge(level: ConfidenceLevel) -> None:

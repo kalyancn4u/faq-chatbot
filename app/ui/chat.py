@@ -17,7 +17,7 @@ from app.retrieval.search import SemanticSearch
 from app.services.faq_service import AnswerResult, AnswerStatus, FAQService
 from app.services.feedback_service import FeedbackService
 from app.services.response_formatter import Channel, format_reply
-from app.ui.components import confidence_badge, get_index_manager
+from app.ui.components import channel_preview_box, confidence_badge, get_index_manager
 
 
 def _answer(question: str) -> AnswerResult:
@@ -79,9 +79,10 @@ def _render_channel_preview(result: AnswerResult, channel: Channel) -> None:
     formatted = format_reply(result, channel)
 
     st.caption(f"Preview — sent as **{formatted.channel_label}**:")
-    # st.code shows the raw characters (literal *bold*, escaped \. etc.) in a
-    # monospace box — this is precisely what the channel would deliver.
-    st.code(formatted.text, language=None)
+    # A wrapping, full-width monospace box shows the raw characters (literal
+    # *bold*, escaped \. etc.) exactly as the channel would deliver them, while
+    # reflowing to the window width instead of overflowing sideways.
+    channel_preview_box(formatted.text)
 
     meta = f"{formatted.char_count} characters"
     if formatted.max_length is not None:
