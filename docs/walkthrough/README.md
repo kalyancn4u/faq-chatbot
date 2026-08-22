@@ -21,6 +21,10 @@ horizontal rule (`───`). Every slide ends with a **Footnotes** block that 
 jargon, explains the reasoning, flags pitfalls, and points to further reading. Read
 them — the footnotes are where the nuance lives.
 
+> **📺 Live slides:** the decks are published to GitHub Pages on every push —
+> **[view them online](https://kalyancn4u.github.io/faq-chatbot/)** (combined deck +
+> one per chapter). See [`.github/workflows/pages.yml`](../../.github/workflows/pages.yml).
+
 > **Two ways to read it**
 > 1. **As a document** (recommended first pass): just scroll — it reads top to
 >    bottom like a book with slide breaks.

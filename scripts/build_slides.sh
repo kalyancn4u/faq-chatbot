@@ -20,8 +20,14 @@ OUT_DIR="${OUT_DIR:-$REPO_ROOT/build/slides}"
 PDF=""
 [ "${1:-}" = "--pdf" ] && PDF="1"
 
-if ! command -v npx >/dev/null 2>&1; then
-  echo "Error: npx (Node.js) not found. Install Node.js from https://nodejs.org, then re-run." >&2
+# The Marp command. Defaults to fetching Marp CLI on demand via npx; CI (or anyone
+# with Marp installed) can set MARP_CMD=marp to use a preinstalled binary.
+MARP_CMD="${MARP_CMD:-npx --yes @marp-team/marp-cli@latest}"
+
+marp_bin="${MARP_CMD%% *}"
+if ! command -v "$marp_bin" >/dev/null 2>&1; then
+  echo "Error: '$marp_bin' not found. Install Node.js from https://nodejs.org (for npx)," >&2
+  echo "       or install Marp CLI and set MARP_CMD=marp." >&2
   exit 1
 fi
 
@@ -41,7 +47,8 @@ cleanup() { for t in "${TEMP_FILES[@]:-}"; do [ -f "$t" ] && rm -f "$t"; done; }
 trap cleanup EXIT
 
 marp_build() { # $1 = input md, $2 = output path, $3 = optional --pdf
-  npx --yes @marp-team/marp-cli@latest "$1" -o "$2" --allow-local-files ${3:-}
+  # shellcheck disable=SC2086  # MARP_CMD is intentionally word-split (e.g. "npx --yes ...")
+  $MARP_CMD "$1" -o "$2" --allow-local-files ${3:-}
 }
 
 # --- one deck per chapter ---

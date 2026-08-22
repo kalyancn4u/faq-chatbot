@@ -46,6 +46,8 @@ extensive footnotes, pitfalls, and hands-on exercises on every page.
 
 - **[▶ Start the walk-through](docs/walkthrough/README.md)** — the landing page: learning
   path, how to read it (as a doc *or* as slides), and conventions.
+- **[📺 View the slides online](https://kalyancn4u.github.io/faq-chatbot/)** — the decks,
+  auto-published to GitHub Pages on every push (combined deck + one per chapter).
 - **[📖 Glossary](docs/walkthrough/GLOSSARY.md)** — every term (embedding, cosine, FAISS,
   invariant, soft-delete…) defined in plain language.
 
