@@ -1,18 +1,33 @@
 <#
 .SYNOPSIS
-    Build the code walk-through chapters into HTML slide decks with Marp.
+    Build a Marp slide deck from a folder of Markdown chapters.
 
 .DESCRIPTION
-    Renders each numbered chapter in docs/walkthrough/ into a self-contained HTML
-    slide deck, plus one combined deck of all chapters. The source .md files are
-    left untouched (no Marp front-matter committed, so they render cleanly on
-    GitHub); this script injects the front-matter into temporary copies at build
-    time.
+    Generic: point it at ANY folder of numbered `NN-*.md` chapters (a code
+    walk-through, a design review, a talk, ...) via -SrcDir. By default the decks
+    are written to a `slides/` subfolder INSIDE that source folder, so the
+    rendered slides sit right next to the Markdown they came from -- intuitive,
+    self-describing context (e.g. docs/walkthrough/ -> docs/walkthrough/slides/).
+
+    Renders each numbered chapter into a self-contained HTML slide deck, plus one
+    combined deck of all chapters. The source .md files are left untouched (no
+    Marp front-matter committed, so they render cleanly on GitHub); this script
+    injects the front-matter into temporary copies at build time.
 
     Requires Node.js (for `npx`). Marp CLI is fetched on first run via npx.
 
+.PARAMETER SrcDir
+    Source folder of NN-*.md chapters (default: docs/walkthrough). Relative paths
+    resolve against the repo root.
+
 .PARAMETER OutDir
-    Output directory (default: build/slides, which is git-ignored).
+    Output directory (default: <SrcDir>/slides, which is git-ignored).
+
+.PARAMETER Footer
+    Footer text stamped on every slide.
+
+.PARAMETER Combined
+    Basename of the all-chapters deck (default: walkthrough-full).
 
 .PARAMETER Pdf
     Also export PDFs (needs a Chromium/Chrome available to Marp).
@@ -20,18 +35,26 @@
 .EXAMPLE
     ./scripts/build_slides.ps1
     ./scripts/build_slides.ps1 -Pdf
+    ./scripts/build_slides.ps1 -SrcDir docs/design-review -Footer 'Design Review' -Combined review-full
 #>
 [CmdletBinding()]
 param(
-    [string]$OutDir = "build/slides",
+    [string]$SrcDir = "docs/walkthrough",
+    [string]$OutDir,
+    [string]$Footer = "Semantic FAQ Chatbot - Code Walk-Through",
+    [string]$Combined = "walkthrough-full",
     [switch]$Pdf
 )
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
-$WalkDir  = Join-Path $RepoRoot "docs/walkthrough"
-$OutPath  = if ([System.IO.Path]::IsPathRooted($OutDir)) { $OutDir } else { Join-Path $RepoRoot $OutDir }
+$SrcPath  = if ([System.IO.Path]::IsPathRooted($SrcDir)) { $SrcDir } else { Join-Path $RepoRoot $SrcDir }
+if (-not (Test-Path $SrcPath)) { Write-Error "Source folder not found: $SrcPath" }
+
+# Default the output to a slides/ subfolder inside the source folder.
+if (-not $OutDir) { $OutDir = Join-Path $SrcPath "slides" }
+$OutPath = if ([System.IO.Path]::IsPathRooted($OutDir)) { $OutDir } else { Join-Path $RepoRoot $OutDir }
 
 if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
     Write-Error "npx (Node.js) not found. Install Node.js from https://nodejs.org, then re-run."
@@ -54,34 +77,37 @@ New-Item -ItemType Directory -Force -Path $OutPath | Out-Null
 
 # Marp keeps relative image paths in HTML (it does not inline them), so copy the
 # images next to the decks: 'assets/architecture.svg' then resolves from OutPath.
-$assetsDst = Join-Path $OutPath "assets"
-New-Item -ItemType Directory -Force -Path $assetsDst | Out-Null
-Copy-Item (Join-Path $WalkDir "assets/*.svg") $assetsDst -Force -ErrorAction SilentlyContinue
+$assetsSrc = Join-Path $SrcPath "assets"
+if (Test-Path (Join-Path $assetsSrc "*.svg")) {
+    $assetsDst = Join-Path $OutPath "assets"
+    New-Item -ItemType Directory -Force -Path $assetsDst | Out-Null
+    Copy-Item (Join-Path $assetsSrc "*.svg") $assetsDst -Force -ErrorAction SilentlyContinue
+}
 
 # Keep this script ASCII-only: Windows PowerShell 5.1 reads BOM-less .ps1 files as
 # ANSI, which would corrupt any non-ASCII literal here. (Chapter content keeps its
 # Unicode because we read it explicitly as UTF-8 below.)
-$Theme = Join-Path $WalkDir "assets/marp-theme.css"
+$Theme = Join-Path $SrcPath "assets/marp-theme.css"
 $Config = Join-Path $RepoRoot ".marprc.yml"     # markdown options (e.g. breaks: false)
 $FrontMatter = @"
 ---
 marp: true
 theme: walkthrough
 paginate: true
-footer: 'Semantic FAQ Chatbot - Code Walk-Through'
+footer: '$Footer'
 ---
 
 "@
 
-# Numbered chapters only (01-..10-), in order. README.md / GLOSSARY.md are excluded.
-$chapters = Get-ChildItem -Path $WalkDir -Filter '??-*.md' | Sort-Object Name
-if (-not $chapters) { Write-Error "No chapter files found in $WalkDir" }
+# Numbered chapters only (01-..NN-), in order. README.md / GLOSSARY.md are excluded.
+$chapters = Get-ChildItem -Path $SrcPath -Filter '??-*.md' | Sort-Object Name
+if (-not $chapters) { Write-Error "No chapter files (NN-*.md) found in $SrcPath" }
 
 $tempFiles = @()
 try {
     # --- one deck per chapter ---
     foreach ($ch in $chapters) {
-        $tmp = Join-Path $WalkDir ("_build_" + $ch.BaseName + ".md")
+        $tmp = Join-Path $SrcPath ("_build_" + $ch.BaseName + ".md")
         $tempFiles += $tmp
         Set-Content -Path $tmp -Value ($FrontMatter + (Get-Content $ch.FullName -Raw -Encoding UTF8)) -Encoding utf8
 
@@ -95,16 +121,16 @@ try {
     }
 
     # --- one combined deck of all chapters ---
-    $combinedTmp = Join-Path $WalkDir "_build_walkthrough-full.md"
+    $combinedTmp = Join-Path $SrcPath ("_build_" + $Combined + ".md")
     $tempFiles += $combinedTmp
     $parts = foreach ($ch in $chapters) { Get-Content $ch.FullName -Raw -Encoding UTF8 }
     Set-Content -Path $combinedTmp -Value ($FrontMatter + ($parts -join "`n`n---`n`n")) -Encoding utf8
 
-    $combinedHtml = Join-Path $OutPath "walkthrough-full.html"
+    $combinedHtml = Join-Path $OutPath ($Combined + ".html")
     Write-Host "Building combined deck -> $combinedHtml"
     Invoke-Marp @($combinedTmp, "-o", $combinedHtml, "-c", $Config, "--no-stdin", "--allow-local-files", "--theme", $Theme)
     if ($Pdf) {
-        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath "walkthrough-full.pdf"), "-c", $Config, "--pdf", "--no-stdin", "--allow-local-files", "--theme", $Theme)
+        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath ($Combined + ".pdf")), "-c", $Config, "--pdf", "--no-stdin", "--allow-local-files", "--theme", $Theme)
     }
 }
 finally {
@@ -112,4 +138,4 @@ finally {
 }
 
 Write-Host ""
-Write-Host "Done. Open the decks in $OutPath (e.g. walkthrough-full.html)."
+Write-Host "Done. Open the decks in $OutPath (e.g. $Combined.html)."

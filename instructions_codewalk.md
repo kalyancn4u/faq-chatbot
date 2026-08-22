@@ -233,18 +233,32 @@ options:
   attached to a TTY (backgrounded builds, some CI).
 
 ### C2. `scripts/build_slides.sh` (macOS / Linux / CI)
-Renders each chapter **and** a combined deck to self‑contained HTML. Customize `WALK_DIR`, the
-theme name in `FRONT_MATTER`, and the `footer` string.
+Renders each chapter **and** a combined deck to self‑contained HTML. It is **generic**: the
+source folder is a parameter (`SRC_DIR`), so the *same* script builds any presentation from its
+own chapter folder — the content comes from whichever Markdown folder you point it at. By default
+the decks are written to a **`slides/` subfolder inside that source folder** (e.g.
+`docs/walkthrough/` → `docs/walkthrough/slides/`), so the rendered slides sit **right next to the
+Markdown they came from** rather than in a detached top‑level `build/`. Everything else —
+`OUT_DIR`, the `FOOTER` string, the combined‑deck name — is overridable too; no per‑repo editing
+of the script is needed.
 ```bash
 #!/usr/bin/env bash
-# Build the code walk-through chapters into HTML slide decks with Marp.
+# Build a Marp slide deck from a folder of Markdown chapters. GENERIC over SRC_DIR.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-WALK_DIR="$REPO_ROOT/docs/walkthrough"
-OUT_DIR="${OUT_DIR:-$REPO_ROOT/build/slides}"
+
+# What to build (all overridable via env):
+SRC_REL="${SRC_DIR:-docs/walkthrough}"                # folder of NN-*.md chapters
+case "$SRC_REL" in /*) SRC_DIR="$SRC_REL" ;; *) SRC_DIR="$REPO_ROOT/$SRC_REL" ;; esac
+OUT_DIR="${OUT_DIR:-$SRC_DIR/slides}"                 # default: slides/ INSIDE the source folder
+FOOTER="${FOOTER:-<PROJECT> — Code Walk-Through}"     # slide footer text
+COMBINED="${COMBINED:-walkthrough-full}"              # basename of the all-chapters deck
+THEME="${THEME:-$SRC_DIR/assets/marp-theme.css}"
+CONFIG="${MARP_CONFIG:-$REPO_ROOT/.marprc.yml}"
 PDF=""
 [ "${1:-}" = "--pdf" ] && PDF="1"
+[ -d "$SRC_DIR" ] || { echo "Source folder not found: $SRC_DIR" >&2; exit 1; }
 
 # Default to npx; CI (or anyone with Marp installed) sets MARP_CMD=marp.
 MARP_CMD="${MARP_CMD:-npx --yes @marp-team/marp-cli@latest}"
@@ -253,15 +267,14 @@ command -v "$marp_bin" >/dev/null 2>&1 || { echo "Install Node.js, or set MARP_C
 
 mkdir -p "$OUT_DIR"
 # Marp keeps relative <img> paths (it does NOT inline them) -> copy assets next to the decks.
-mkdir -p "$OUT_DIR/assets"
-cp "$WALK_DIR/assets/"*.svg "$OUT_DIR/assets/" 2>/dev/null || true
+if compgen -G "$SRC_DIR/assets/"'*.svg' > /dev/null 2>&1; then
+  mkdir -p "$OUT_DIR/assets"; cp "$SRC_DIR/assets/"*.svg "$OUT_DIR/assets/" 2>/dev/null || true
+fi
 
-THEME="$WALK_DIR/assets/marp-theme.css"
-CONFIG="$REPO_ROOT/.marprc.yml"
-FRONT_MATTER=$'---\nmarp: true\ntheme: walkthrough\npaginate: true\nfooter: \'<PROJECT> — Code Walk-Through\'\n---\n\n'
+FRONT_MATTER=$'---\nmarp: true\ntheme: walkthrough\npaginate: true\nfooter: \''"$FOOTER"$'\'\n---\n\n'
 
-mapfile -t CHAPTERS < <(find "$WALK_DIR" -maxdepth 1 -name '[0-9][0-9]-*.md' | sort)
-[ "${#CHAPTERS[@]}" -gt 0 ] || { echo "No chapters in $WALK_DIR" >&2; exit 1; }
+mapfile -t CHAPTERS < <(find "$SRC_DIR" -maxdepth 1 -name '[0-9][0-9]-*.md' | sort)
+[ "${#CHAPTERS[@]}" -gt 0 ] || { echo "No chapters (NN-*.md) in $SRC_DIR" >&2; exit 1; }
 
 TEMP_FILES=()
 cleanup() { for t in "${TEMP_FILES[@]:-}"; do [ -f "$t" ] && rm -f "$t"; done; }
@@ -274,36 +287,44 @@ marp_build() {  # $1 in.md  $2 out  $3 optional --pdf
 
 # one deck per chapter
 for ch in "${CHAPTERS[@]}"; do
-  base="$(basename "$ch" .md)"; tmp="$WALK_DIR/_build_${base}.md"; TEMP_FILES+=("$tmp")
+  base="$(basename "$ch" .md)"; tmp="$SRC_DIR/_build_${base}.md"; TEMP_FILES+=("$tmp")
   printf '%s' "$FRONT_MATTER" > "$tmp"; cat "$ch" >> "$tmp"
   echo "Building $(basename "$ch")"; marp_build "$tmp" "$OUT_DIR/${base}.html"
   [ -n "$PDF" ] && marp_build "$tmp" "$OUT_DIR/${base}.pdf" "--pdf"
 done
 
 # one combined deck
-combined="$WALK_DIR/_build_walkthrough-full.md"; TEMP_FILES+=("$combined")
+combined="$SRC_DIR/_build_${COMBINED}.md"; TEMP_FILES+=("$combined")
 printf '%s' "$FRONT_MATTER" > "$combined"; first=1
 for ch in "${CHAPTERS[@]}"; do
   [ "$first" -eq 1 ] || printf '\n\n---\n\n' >> "$combined"; cat "$ch" >> "$combined"; first=0
 done
-marp_build "$combined" "$OUT_DIR/walkthrough-full.html"
-[ -n "$PDF" ] && marp_build "$combined" "$OUT_DIR/walkthrough-full.pdf" "--pdf"
-echo "Done -> $OUT_DIR (open walkthrough-full.html)"
+marp_build "$combined" "$OUT_DIR/${COMBINED}.html"
+[ -n "$PDF" ] && marp_build "$combined" "$OUT_DIR/${COMBINED}.pdf" "--pdf"
+echo "Done -> $OUT_DIR (open ${COMBINED}.html)"
 ```
-Run: `./scripts/build_slides.sh` (add `--pdf` for PDFs; `MARP_CMD=marp` to use an installed binary).
+Run `./scripts/build_slides.sh` (→ `docs/walkthrough/slides/`). Add `--pdf` for PDFs, or
+`MARP_CMD=marp` to use an installed binary. Build a **different** presentation without editing the
+script: `SRC_DIR=docs/design-review FOOTER='Design Review' COMBINED=review-full ./scripts/build_slides.sh`.
+
+**Git‑ignore the derived decks** — since the output now lives under your tracked docs tree, add
+`docs/**/slides/` and `docs/**/_build_*.md` to `.gitignore` so built decks and temp files are
+never committed.
 
 ### C3. Windows (`scripts/build_slides.ps1`)
-Mirror the bash logic with two Windows‑specific rules: **read sources as UTF‑8 and keep the
-`.ps1` ASCII‑only** (PowerShell 5.1 reads BOM‑less files as ANSI → em‑dashes become mojibake),
+Mirror the bash logic (same `-SrcDir` / `-OutDir` / `-Footer` / `-Combined` parameters, same
+default of `<SrcDir>/slides`) with two Windows‑specific rules: **read sources as UTF‑8 and keep
+the `.ps1` ASCII‑only** (PowerShell 5.1 reads BOM‑less files as ANSI → em‑dashes become mojibake),
 and **judge Marp success by exit code, not stderr** (with `$ErrorActionPreference='Stop'`, a
 native command's stderr looks fatal). Pass the same flags: `-c .marprc.yml --no-stdin
---allow-local-files --theme <theme>`.
+--allow-local-files --theme <theme>`. Run: `./scripts/build_slides.ps1` (add `-Pdf` for PDFs;
+`-SrcDir docs/design-review -Footer 'Design Review' -Combined review-full` for a different deck).
 
 ---
 
 ## D. Validate — don't guess
 
-- **Overflow must be zero.** Serve `build/slides/` and, in the deck's console, measure **after
+- **Overflow must be zero.** Serve `docs/walkthrough/slides/` and, in the deck's console, measure **after
   the page settles** (first paint can report a phantom ~20px that clears on reflow — re‑run):
   ```js
   [...document.querySelectorAll('section')]
@@ -346,7 +367,9 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: npm install -g @marp-team/marp-cli@latest
       - name: Build slide decks
-        env: { MARP_CMD: marp, OUT_DIR: ${{ github.workspace }}/_site/slides }
+        # Redirect OUT_DIR into the Pages artifact; the deployed URL stays
+        # https://<owner>.github.io/<repo>/slides/... regardless of the local default.
+        env: { MARP_CMD: marp, SRC_DIR: docs/walkthrough, OUT_DIR: ${{ github.workspace }}/_site/slides }
         run: bash scripts/build_slides.sh
       - name: Generate landing page
         run: |
@@ -438,7 +461,7 @@ for p in sorted(glob.glob('docs/walkthrough/[0-9][0-9]-*.md')):
    `.marprc.yml` (§C1) and `scripts/build_slides.sh` (§C2).
 2. Draft chapters **in data‑flow order**; one idea per slide; footnotes on each; label every
    code block with its file; bullet where apt.
-3. Build locally: `./scripts/build_slides.sh` → open `build/slides/walkthrough-full.html`.
+3. Build locally: `./scripts/build_slides.sh` → open `docs/walkthrough/slides/walkthrough-full.html`.
 4. **Validate** (§D): overflow = 0 (measure after settle) and eyeball the PNGs; test the light‑pin.
 5. Wire your top‑level **`README.md`** to the walk‑through landing page (and this kit).
 6. Add `.github/workflows/pages.yml` (§E1), enable Pages once (§E2), push. Visit

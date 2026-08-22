@@ -12,8 +12,11 @@ env/
 # --- Environment / secrets ---
 .env
 
-# --- Slide-build temp files (created/removed by scripts/build_slides.*) ---
-docs/walkthrough/_build_*.md
+# --- Slide-build output + temp files (created by scripts/build_slides.*) ---
+# Decks now build next to their source markdown (e.g. docs/walkthrough/slides/);
+# they are derived artifacts, so never commit them.
+docs/**/slides/
+docs/**/_build_*.md
 
 # --- App-generated artifacts (derived; not committed) ---
 data/database/*.db

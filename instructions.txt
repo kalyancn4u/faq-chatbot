@@ -77,7 +77,11 @@ Sidebar: Chat/Admin, "Reply format" (Chat/WhatsApp/Telegram/SMS), "Developer mod
 Local build (needs Node):
     scripts\build_slides.ps1        # Windows;  -Pdf for PDFs
     ./scripts/build_slides.sh       # macOS/Linux/CI;  --pdf for PDFs
-    -> build/slides/ (open walkthrough-full.html)
+    -> docs/walkthrough/slides/ (open walkthrough-full.html)  [git-ignored, next to source]
+Generic: the source folder is a parameter, so the same script builds any deck --
+    SRC_DIR=docs/<other> FOOTER='...' COMBINED=<name> ./scripts/build_slides.sh
+    (PowerShell: -SrcDir / -Footer / -Combined).  Default OUT_DIR = <SRC_DIR>/slides.
+    CI overrides OUT_DIR=_site/slides so the published URL is unchanged.
 Publish: push to main -> .github/workflows/pages.yml rebuilds + deploys to Pages.
 (Pages already enabled once via `gh api ... /pages -f build_type=workflow`; the
  Actions token CANNOT create the site, so don't rely on enablement:true.)
@@ -89,7 +93,7 @@ render slides to PNG and open the images — this is the reliable check:
     marp docs/walkthrough/06-*.md --images png -c .marprc.yml --no-stdin \
       --allow-local-files --theme docs/walkthrough/assets/marp-theme.css -o /tmp/png/ch.png
     # then open /tmp/png/ch.006.png etc.
-Overflow check (still fine to run in a browser): serve build/slides on a local
+Overflow check (still fine to run in a browser): serve docs/walkthrough/slides on a local
 static server and, in the deck's console, measure AFTER the page settles
 (re-run once; first paint can report a phantom ~20px):
     [...document.querySelectorAll('section')].map(s=>s.scrollHeight-s.clientHeight)

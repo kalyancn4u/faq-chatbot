@@ -46,8 +46,12 @@ jobs:
         run: npm install -g @marp-team/marp-cli@latest
 
       - name: Build slide decks
+        # The script defaults to building into <SRC_DIR>/slides; for publishing we
+        # redirect the output into _site/slides so the deployed URL stays
+        # https://<owner>.github.io/<repo>/slides/... unchanged.
         env:
           MARP_CMD: marp
+          SRC_DIR: docs/walkthrough
           OUT_DIR: ${{ github.workspace }}/_site/slides
         run: bash scripts/build_slides.sh
 

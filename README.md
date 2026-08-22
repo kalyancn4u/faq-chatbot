@@ -64,7 +64,7 @@ extensive footnotes, pitfalls, and hands-on exercises on every page.
 ./scripts/build_slides.ps1     # Windows (PowerShell);  add -Pdf for PDFs
 ./scripts/build_slides.sh      # macOS/Linux;           add --pdf for PDFs
 ```
-Decks land in `build/slides/` (open `walkthrough-full.html`). Requires [Node.js](https://nodejs.org).
+Decks land in `docs/walkthrough/slides/` — right next to their source (open `walkthrough-full.html`). Requires [Node.js](https://nodejs.org).
 
 <details>
 <summary><b>The ten chapters (click to expand)</b></summary>

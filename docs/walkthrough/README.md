@@ -34,7 +34,8 @@ them — the footnotes are where the nuance lives.
 >    ./scripts/build_slides.ps1     # Windows (PowerShell);  add -Pdf for PDFs
 >    ./scripts/build_slides.sh      # macOS/Linux;           add --pdf for PDFs
 >    ```
->    Decks land in `build/slides/` (open `walkthrough-full.html`). The script
+>    Decks land in `docs/walkthrough/slides/` — right beside these chapters
+>    (open `walkthrough-full.html`). The script
 >    injects Marp front-matter into temporary copies, so the source files stay
 >    clean for GitHub. **Requires [Node.js](https://nodejs.org)** (Marp CLI is
 >    fetched automatically via `npx`).

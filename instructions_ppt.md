@@ -152,20 +152,42 @@ Two scripts render every chapter + a combined deck into self‑contained HTML:
   [`scripts/build_slides.sh`](scripts/build_slides.sh) (macOS/Linux/CI).
 
 ```bash
-./scripts/build_slides.sh            # HTML decks into build/slides/
+./scripts/build_slides.sh            # HTML decks into docs/walkthrough/slides/
 ./scripts/build_slides.sh --pdf      # also PDFs (needs Chromium)
 MARP_CMD=marp ./scripts/build_slides.sh    # use an installed marp (CI does this)
 ```
 
+**Decks build *next to their source*.** The output defaults to a `slides/`
+subfolder **inside the source folder** — `docs/walkthrough/` → `docs/walkthrough/slides/`
+— so the rendered decks live beside the Markdown they came from (intuitive,
+self‑describing context) instead of in a detached top‑level `build/`. The
+generated `slides/` is git‑ignored (a derived artifact).
+
+**The scripts are generic** — they take the *source folder* as a parameter, so the
+same script serves any presentation, drawing its content from whichever
+Markdown‑chapter folder you point it at:
+
+```bash
+# a different deck (e.g. a design review) from its own chapters:
+SRC_DIR=docs/design-review FOOTER='Design Review' COMBINED=review-full \
+  ./scripts/build_slides.sh          # -> docs/design-review/slides/
+OUT_DIR=/tmp/decks ./scripts/build_slides.sh   # override the output folder
+# PowerShell equivalent:
+./scripts/build_slides.ps1 -SrcDir docs/design-review -Footer 'Design Review' -Combined review-full
+```
+
 What the scripts do, and **why**:
 
-1. **Inject front‑matter** (`marp: true`, `theme: walkthrough`, `paginate`, `footer`) into a
-   temp copy of each chapter — so the committed `.md` stays clean for GitHub.
-2. Build each chapter **and** a concatenated `walkthrough-full.html`.
-3. **Copy `assets/*.svg` next to the decks** — Marp does **not** inline `<img>` into HTML,
+1. Resolve the **source folder** (`SRC_DIR` / `-SrcDir`, default `docs/walkthrough`) and
+   default the output to **`<SRC_DIR>/slides/`** (override with `OUT_DIR` / `-OutDir`).
+2. **Inject front‑matter** (`marp: true`, `theme: walkthrough`, `paginate`, a configurable
+   `footer`) into a temp copy of each chapter — so the committed `.md` stays clean for GitHub.
+3. Build each `NN-*.md` chapter **and** a concatenated combined deck (`COMBINED`, default
+   `walkthrough-full.html`).
+4. **Copy `assets/*.svg` next to the decks** — Marp does **not** inline `<img>` into HTML,
    so a relative `assets/architecture.svg` would 404 without this.
-4. Pass `-c .marprc.yml --no-stdin --allow-local-files --theme assets/marp-theme.css`.
-5. Clean up temp files in a `finally`/`trap`.
+5. Pass `-c .marprc.yml --no-stdin --allow-local-files --theme <SRC_DIR>/assets/marp-theme.css`.
+6. Clean up temp files in a `finally`/`trap`.
 
 **Two Marp options that matter a lot** (in `.marprc.yml` / the CLI flags):
 
@@ -224,7 +246,9 @@ and check a slide's background stays white with dark text —
 
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml): on push, install Marp CLI,
 run `build_slides.sh` (`MARP_CMD=marp`), generate a landing `index.html` linking to every
-deck, and deploy with the official Pages actions.
+deck, and deploy with the official Pages actions. CI sets `OUT_DIR=_site/slides` so the build
+writes straight into the Pages artifact — the deployed URL stays
+`https://<owner>.github.io/<repo>/slides/…` regardless of where local builds land.
 
 Enable Pages **once** (the Actions token can't create the site):
 
@@ -242,8 +266,8 @@ Then every push rebuilds and republishes the decks automatically.
 2. Drop in the theme (`marp-theme.css`) and copy/adapt the two `build_slides` scripts.
 3. Draft chapters **in data‑flow order**; one idea per slide; footnotes on each; label
    every code block with its file.
-4. Build locally (`build_slides.sh`), then **validate**: overflow = 0 (§6) and eyeball the
-   PNGs.
+4. Build locally (`build_slides.sh` → `docs/walkthrough/slides/`), then **validate**:
+   overflow = 0 (§6) and eyeball the PNGs.
 5. Wire the base `README.md` to the walk‑through landing page.
 6. Add the Pages workflow, enable Pages once, push — done.
 
