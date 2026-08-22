@@ -60,7 +60,22 @@ Everything in the codebase is an implementation detail of one of these four idea
 
 ![Architecture of the Semantic FAQ Chatbot: a question flows from the user through the Streamlit UI, the Sentence Transformer (embedding), FAISS (nearest vectors), and SQLite (authoritative answer), then through confidence handling and channel formatting to a reply. Design Law #1: FAISS is a derived index rebuilt from SQLite. Design Law #2: a weak match never becomes an answer.](assets/architecture.svg)
 
-<sub>*(Text version of the same diagram, for screen readers and slide/terminal viewing:)*</sub>
+Read it top to bottom: that arrow is *exactly* the journey each chapter zooms into.[1]
+A plain-text version is on the next slide (screen-reader and terminal friendly).[2]
+
+> **Footnotes**
+> [1] Notice the split of responsibilities: **embeddings** understand language,
+> **FAISS** finds candidates, **SQLite** holds truth, **services** make decisions,
+> **UI** presents. This separation is not decoration — it is what makes each part
+> testable and replaceable (Chapter 9).
+> [2] Same information, two forms — the diagram for a quick visual grasp, the text
+> for accessibility and copy-paste. Separate slides keep each one legible.
+
+---
+
+## The architecture — text version
+
+*The same flow as the diagram, in plain text:*
 
 ```text
    User types a question
@@ -99,13 +114,10 @@ Everything in the codebase is an implementation detail of one of these four idea
    Formatted for the chosen channel (app/services/response_formatter.py)  Chapter 7
 ```
 
-Read it top to bottom: that arrow is *exactly* the journey each chapter zooms into.[1]
-
 > **Footnotes**
-> [1] Notice the split of responsibilities: **embeddings** understand language,
-> **FAISS** finds candidates, **SQLite** holds truth, **services** make decisions,
-> **UI** presents. This separation is not decoration — it is what makes each part
-> testable and replaceable (Chapter 9).
+> [1] Each box names the responsible package and its chapter, so you can trace the
+> flow straight into the code: `app/ui/` (Ch 8) → `app/embeddings/` (Ch 4) →
+> `app/retrieval/` (Ch 5) → `app/database/` (Ch 3) → `app/services/` (Ch 6–7).
 
 ---
 
