@@ -33,6 +33,7 @@ FAISS knows only about **vectors and their positions** (row 0, row 1, …). It d
 ## Choosing the simplest correct index
 
 ```python
+# app/retrieval/faiss_index.py
 def build_index(embeddings):
     index = faiss.IndexFlatIP(embeddings.shape[1])   # inner product, exact
     index.add(vectors)
@@ -73,6 +74,7 @@ faq_ids:  [ 12,      7,       31,      4 ]     ← faq_ids[position] = SQLite id
 We build the vectors and this list **in the same order**, then persist both:
 
 ```python
+# app/retrieval/index_manager.py — IndexManager.rebuild
 faq_ids = [f.id for f in faqs]         # order matches the embeddings
 questions = [f.question for f in faqs]
 embeddings = self._embedder.encode(questions)
@@ -95,6 +97,7 @@ SQLite.[1]
 After building, the code **validates** before publishing anything:
 
 ```python
+# app/retrieval/index_manager.py
 def _validate(indexed, mapped, expected_active):
     if not (indexed == mapped == expected_active):
         raise IndexConsistencyError(...)
@@ -127,6 +130,7 @@ inconsistent. To prevent this, we write to **temp files**, then **atomically
 replace**:[1]
 
 ```python
+# app/retrieval/index_manager.py — IndexManager._atomic_write
 faiss_index.save_index(index, tmp_index)
 tmp_map.write_text(json.dumps(payload))
 os.replace(tmp_index, self._index_path)     # atomic on the same filesystem
@@ -153,6 +157,7 @@ The index is a derived artifact, so it can fall out of date. `is_stale` detects
 this by comparing the map to the current world:[1]
 
 ```python
+# app/retrieval/index_manager.py
 def is_stale(self, conn) -> bool:
     if not self.exists(): return True
     if payload["model"] != self._embedder.model_name: return True   # model changed
@@ -177,6 +182,7 @@ to build automatically on first launch.[2]
 ## Searching, end to end (within the index)
 
 ```python
+# app/retrieval/index_manager.py — IndexManager.search
 def search(self, query, top_k=None):
     self._ensure_loaded()                       # load from disk if needed
     query_vec = self._embedder.encode_one(query)

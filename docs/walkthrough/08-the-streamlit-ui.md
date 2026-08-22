@@ -40,6 +40,7 @@ The embedding model and the FAISS index must **not** reload on every rerun. We c
 them:
 
 ```python
+# app/ui/components.py
 @st.cache_resource(show_spinner=False)
 def get_index_manager() -> IndexManager:
     return IndexManager()
@@ -74,6 +75,7 @@ The chat history must survive reruns (otherwise every keystroke would erase the
 conversation):
 
 ```python
+# app/ui/chat.py — render_chat_page
 st.session_state.setdefault("history", [])          # persists across reruns
 ...
 st.session_state.history.append({"result": result, "feedback": None})
@@ -117,6 +119,7 @@ Each page **calls services** (Chapter 6/7); it contains no SQL and no FAISS code
 ## The chat turn: rendering one exchange
 
 ```python
+# app/ui/chat.py
 def _render_turn(index, entry, channel, dev_mode):
     with st.chat_message("user"):
         st.write(entry["result"].user_question)
@@ -146,6 +149,7 @@ Some previews need real HTML (a wrapping monospace box, a responsive table).
 Streamlit allows it, but raw content must be made safe and literal:[1]
 
 ```python
+# app/ui/components.py
 def escape_literal(text):
     out = html.escape(str(text), quote=False)          # neutralize < > &
     for char, entity in _MD_NEUTRALIZE.items():         # * _ ` ~ [ ] \  -> entities

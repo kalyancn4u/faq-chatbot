@@ -35,6 +35,7 @@ and reason about.[2]
 ## SemanticSearch: candidates from truth
 
 ```python
+# app/retrieval/search.py — SemanticSearch.search
 def search(self, conn, query, top_k=None) -> list[SearchCandidate]:
     hits = self._index.search(query, top_k=top_k)     # [(faq_id, score), ...]
     repo = FAQRepository(conn)
@@ -64,6 +65,7 @@ FAISS.[1]
 `answer_question` always returns a single structured `AnswerResult`:[1]
 
 ```python
+# app/services/faq_service.py
 @dataclass(frozen=True)
 class AnswerResult:
     user_question: str
@@ -91,6 +93,7 @@ Whatever happens — great match, weak match, no index, empty input — the UI r
 ## The pipeline, step by step
 
 ```python
+# app/services/faq_service.py — FAQService.answer_question
 def answer_question(self, question, top_k=None) -> AnswerResult:
     user_question = (question or "").strip()
     if not user_question:
@@ -121,6 +124,7 @@ render.[1]
 ## The three confidence bands
 
 ```python
+# app/services/faq_service.py — FAQService.answer_question (confidence bands)
 best = candidates[0]                          # highest score first
 if best.score >= settings.similarity_threshold_high:      # ≥ 0.65
     confidence = HIGH
@@ -174,6 +178,7 @@ This is the whole safety argument for a retrieval-only V1.[2]
 Every Low/No-match question is written to `unanswered_questions`:
 
 ```python
+# app/services/faq_service.py — FAQService._log_unanswered
 def _log_unanswered(self, question, best_score):
     try:
         UnansweredRepository(self._conn).log(question, best_score)

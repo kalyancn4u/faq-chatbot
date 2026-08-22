@@ -39,6 +39,7 @@ Every database access goes through one small module so connection concerns are
 configured in exactly one place:
 
 ```python
+# app/database/connection.py
 def connect(db_path=None) -> sqlite3.Connection:
     conn = sqlite3.connect(target)
     conn.row_factory = sqlite3.Row               # access columns by name
@@ -65,6 +66,7 @@ Two easy-to-miss but crucial lines:
 ## The unit-of-work context manager
 
 ```python
+# app/database/connection.py
 @contextmanager
 def get_connection(db_path=None):
     conn = connect(db_path)
@@ -81,6 +83,7 @@ def get_connection(db_path=None):
 Used as:
 
 ```python
+# any caller — pattern from app/database/connection.py
 with get_connection() as conn:
     FAQRepository(conn).add(...)     # commits automatically if no error
 ```
@@ -98,6 +101,7 @@ together, or none do. You cannot forget to commit or leak a connection.
 ## The schema: tables, keys, constraints
 
 ```sql
+-- app/database/schema.py
 CREATE TABLE IF NOT EXISTS faqs (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     question   TEXT NOT NULL UNIQUE,
@@ -141,6 +145,7 @@ All SQL is confined to *repository* classes; the rest of the app calls typed
 methods, never raw cursors.[1]
 
 ```python
+# app/database/repository.py
 class FAQRepository:
     def __init__(self, conn): self._conn = conn
 
@@ -178,12 +183,14 @@ Notice the `?` placeholders above. The values are passed **separately** from the
 SQL text:
 
 ```python
+# app/database/repository.py — the safe pattern used everywhere
 self._conn.execute("... WHERE id = ?", (faq_id,))   # ✅ safe
 ```
 
-Never do this:
+Never do this (anti-example — appears nowhere in the codebase):
 
 ```python
+# ❌ anti-pattern — NOT in this project
 self._conn.execute(f"... WHERE id = {faq_id}")      # ❌ SQL injection risk
 ```
 
@@ -204,6 +211,7 @@ literal with placeholders.
 ## Soft-delete: remove without losing history
 
 ```python
+# app/database/repository.py
 def set_active(self, faq_id, active):        # the default "delete"
     return self.update(faq_id, is_active=active)
 
@@ -231,6 +239,7 @@ Only `is_active = 1` rows are indexed — this is the exact set FAISS is built f
 The importer checks every row before touching the database, and reports outcomes:
 
 ```python
+# app/database/csv_import.py
 def import_faqs_from_csv(conn, csv_path) -> ImportResult:
     # required columns present? else raise a clear error
     # per row: non-empty question & answer? unique? then insert, else count as skipped

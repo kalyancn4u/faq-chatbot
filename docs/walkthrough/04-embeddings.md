@@ -46,6 +46,7 @@ It's chosen in **config**, not hard-coded, so switching to a multilingual model 
 a one-line change:[2]
 
 ```python
+# app/embeddings/embedder.py — Embedder.__init__
 self.model_name = model_name or settings.embedding_model_name
 ```
 
@@ -87,6 +88,7 @@ The embedder returns **L2-normalized** vectors — every vector is scaled to len
 1:[1]
 
 ```python
+# app/embeddings/embedder.py — Embedder.encode
 vectors = model.encode(
     texts,
     convert_to_numpy=True,
@@ -116,6 +118,7 @@ free.
 ## `float32` and shape: speaking FAISS's language
 
 ```python
+# app/embeddings/embedder.py — Embedder.encode (return value)
 return np.asarray(vectors, dtype=np.float32)   # shape (n, 384)
 ```
 
@@ -142,6 +145,7 @@ Loading the model takes a few seconds. Doing it per request would make the app
 crawl. So it's cached:
 
 ```python
+# app/embeddings/embedder.py
 @lru_cache(maxsize=2)
 def _load_model(model_name: str):
     from sentence_transformers import SentenceTransformer   # imported lazily
@@ -170,6 +174,7 @@ On networks that intercept TLS to huggingface.co, the model's *update check* can
 hang. Once the model is cached locally, `HF_OFFLINE=1` skips the network entirely:[1]
 
 ```python
+# app/config/settings.py (not embedder.py — it must run before HF imports)
 if settings.hf_offline:
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")

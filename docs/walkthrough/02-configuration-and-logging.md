@@ -33,6 +33,7 @@ waiting to happen.
 ## One frozen object, imported everywhere
 
 ```python
+# app/config/settings.py
 @dataclass(frozen=True)
 class Settings:
     embedding_model_name: str
@@ -50,6 +51,7 @@ settings: Settings = _build_settings()   # one shared instance
 Other modules do exactly one thing:
 
 ```python
+# any caller — importing from app/config/settings.py
 from app.config.settings import settings
 k = settings.top_k
 ```
@@ -72,6 +74,7 @@ k = settings.top_k
 Each value is read from an environment variable, falling back to a default:
 
 ```python
+# app/config/settings.py — inside _build_settings()
 top_k = _get_int("TOP_K", 5)
 db_path = _resolve(_get_str("DB_PATH", "data/database/faq.db"))
 hf_offline = _get_bool("HF_OFFLINE", False)
@@ -83,6 +86,7 @@ hf_offline = _get_bool("HF_OFFLINE", False)
 Values load from a local `.env` file if present, via `python-dotenv`:[2]
 
 ```python
+# app/config/settings.py
 load_dotenv(PROJECT_ROOT / ".env", override=False)
 ```
 
@@ -104,6 +108,7 @@ the standard precedence.[3]
 Configuration is parsed through small helpers that validate as they read:
 
 ```python
+# app/config/settings.py
 def _get_int(key: str, default: int) -> int:
     raw = os.getenv(key)
     if raw in (None, ""):
@@ -133,6 +138,7 @@ a confusing runtime crash into an obvious startup error.
 Two subtle but important choices:
 
 ```python
+# app/config/settings.py
 @property
 def index_path(self) -> Path:
     return self.index_dir / "faq.faiss"
@@ -159,6 +165,7 @@ def ensure_directories() -> None:      # called explicitly at startup
 ## Logging: configure once, use everywhere
 
 ```python
+# app/config/logging_config.py
 def get_logger(name: str) -> logging.Logger:
     configure_logging()               # no-op after the first call
     return logging.getLogger(name)

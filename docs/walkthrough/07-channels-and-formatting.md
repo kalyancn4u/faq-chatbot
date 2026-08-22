@@ -41,6 +41,7 @@ Instead of `if channel == ...` branches everywhere, each channel is **one small 
 object** describing its rules:[1]
 
 ```python
+# app/services/response_formatter.py
 @dataclass(frozen=True)
 class ChannelSpec:
     channel: Channel
@@ -73,6 +74,7 @@ when you add a channel.[2]
 SMS strips everything and counts the cost:
 
 ```python
+# app/services/response_formatter.py
 def _sms_prepare(text):
     return _collapse_ws(strip_emoji(strip_markdown(text)))   # plain, no emoji
 
@@ -85,6 +87,7 @@ def _sms_prepare(text):
   full message would have taken.[2]
 
 ```python
+# app/services/response_formatter.py
 def _sms_segments(length):
     if length <= 160: return 1
     return math.ceil(length / 153)     # multipart segments are 153 chars each
@@ -105,6 +108,7 @@ Telegram's MarkdownV2 treats many punctuation marks as special. Literal text mus
 **backslash-escape** them or the API rejects the message:[1]
 
 ```python
+# app/services/response_formatter.py
 _TELEGRAM_SPECIAL = r"_*[]()~`>#+-=|{}.!\\"
 
 def escape_markdown_v2(text):
@@ -130,6 +134,7 @@ silently fail. The formatter does it for you via each channel's `prepare`.
 ## Assembling the reply
 
 ```python
+# app/services/response_formatter.py
 def format_reply(result, channel):
     spec = CHANNELS[channel]
     parts = [spec.prepare(result.answer)]

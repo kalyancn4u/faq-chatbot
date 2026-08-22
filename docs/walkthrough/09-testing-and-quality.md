@@ -35,6 +35,7 @@ retrieval, confidence, formatting, and the pure UI helpers.[2]
 ones live in [`tests/conftest.py`](../../tests/conftest.py):
 
 ```python
+# tests/conftest.py
 @pytest.fixture
 def conn(tmp_path):                    # a fresh SQLite file per test
     connection = connect(tmp_path / "test.db")
@@ -67,6 +68,7 @@ Some tests need genuine embeddings (to check that paraphrases actually match). W
 load the real model, but only **once per test session**:
 
 ```python
+# tests/conftest.py
 @pytest.fixture(scope="session")
 def embedder() -> Embedder:
     return Embedder()                  # loaded a single time for all tests
@@ -89,6 +91,7 @@ def embedder() -> Embedder:
 The riskiest logic gets the most direct tests:
 
 ```python
+# tests/test_index_manager.py
 def test_rebuild_creates_consistent_artifacts(index_manager, seeded_conn):
     result = index_manager.rebuild(seeded_conn)
     status = index_manager.status(seeded_conn)
@@ -117,6 +120,7 @@ Embedding scores are floating-point and model-dependent. Asserting
 digits and break the test for no real reason.[1] Instead we assert **relationships**:
 
 ```python
+# tests/test_embeddings.py
 def test_paraphrases_are_more_similar_than_unrelated(embedder):
     v = embedder.encode(["How do I reset my password?",
                          "I forgot my password.",
@@ -142,6 +146,7 @@ The formatter and the HTML builders are **pure functions** (input → output, no
 effects), which makes them trivial to test without a browser or a model:[1]
 
 ```python
+# tests/test_formatting.py  (and test_candidates_table_* is in tests/test_ui_helpers.py)
 def test_telegram_escapes_reserved_characters():
     out = format_reply(_answer("Go to Settings > Billing (30-day)."), Channel.TELEGRAM)
     assert r"\>" in out.text and r"\-" in out.text and r"\." in out.text
