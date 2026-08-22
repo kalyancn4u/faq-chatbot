@@ -36,6 +36,39 @@ validation step.
 
 ---
 
+## 📚 Learn the codebase — Code Walk-Through
+
+New here, or want to truly understand *how* and *why* this works? Start with the
+**[Code Walk-Through](docs/walkthrough/README.md)** — a guided, presentation-style tour
+written for complete beginners, taking you from "what's an embedding?" to mastery of
+every layer. Each chapter follows the path a question travels through the system, with
+extensive footnotes, pitfalls, and hands-on exercises on every page.
+
+- **[▶ Start the walk-through](docs/walkthrough/README.md)** — the landing page: learning
+  path, how to read it (as a doc *or* as slides), and conventions.
+- **[📖 Glossary](docs/walkthrough/GLOSSARY.md)** — every term (embedding, cosine, FAISS,
+  invariant, soft-delete…) defined in plain language.
+
+<details>
+<summary><b>The ten chapters (click to expand)</b></summary>
+
+| # | Chapter | You'll master |
+|---|---------|---------------|
+| 1 | [The Big Picture](docs/walkthrough/01-big-picture.md) | Architecture, the four core concepts, and the two design laws |
+| 2 | [Configuration & Logging](docs/walkthrough/02-configuration-and-logging.md) | Centralized config, frozen dataclasses, env overrides |
+| 3 | [The Database Layer](docs/walkthrough/03-the-database-layer.md) | SQLite, repository pattern, parameterized queries, soft-delete |
+| 4 | [Embeddings](docs/walkthrough/04-embeddings.md) | What an embedding is, cosine, normalization, model caching |
+| 5 | [FAISS & the Index](docs/walkthrough/05-faiss-and-the-index.md) | Vector search, the id map, atomic rebuild, the consistency invariant |
+| 6 | [Retrieval & Confidence](docs/walkthrough/06-retrieval-and-confidence.md) | The service layer, confidence bands, why V1 can't hallucinate |
+| 7 | [Channels & Formatting](docs/walkthrough/07-channels-and-formatting.md) | Chat/WhatsApp/Telegram/SMS, MarkdownV2 escaping, SMS segments |
+| 8 | [The Streamlit UI](docs/walkthrough/08-the-streamlit-ui.md) | Rerun model, `cache_resource`, `session_state`, safe HTML |
+| 9 | [Testing & Quality](docs/walkthrough/09-testing-and-quality.md) | Fixtures, testing ML without brittleness |
+| 10 | [Mastery: End-to-End](docs/walkthrough/10-mastery-end-to-end.md) | A full query trace, extension projects, a self-check |
+
+</details>
+
+---
+
 ## Why SQLite + FAISS?
 
 - **What is an embedding?** An embedding model reads a piece of text and outputs a
@@ -222,7 +255,7 @@ app/
   services/               FAQ / feedback / admin / response_formatter services
   ui/                     chat + admin pages                       (Phase 6)
 data/                     sample FAQs, SQLite db, FAISS indexes
-docs/                     CHANNELS.md (reply-format beginner's guide)
+docs/                     CHANNELS.md + walkthrough/ (full code walk-through)
 scripts/                  initialize_database / import_faqs / rebuild_index
 tests/                    pytest suite                             (Phase 7)
 ```
