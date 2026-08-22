@@ -71,6 +71,19 @@ _MD_NEUTRALIZE = {
 }
 
 
+def escape_literal(text: str) -> str:
+    r"""HTML-escape text and entity-encode Markdown characters for literal display.
+
+    Used wherever raw content is placed inside ``st.markdown`` HTML: escapes
+    ``& < >`` (so it cannot inject markup) and encodes ``\ * _ ` ~ [ ]`` as
+    entities so Streamlit's Markdown parser renders them as themselves.
+    """
+    out = html.escape(str(text), quote=False)
+    for char, entity in _MD_NEUTRALIZE.items():
+        out = out.replace(char, entity)
+    return out
+
+
 def channel_preview_box(text: str) -> None:
     """Render channel-formatted text exactly as it would be sent.
 
@@ -79,14 +92,8 @@ def channel_preview_box(text: str) -> None:
     **wrap** instead of overflowing, and ``width:100%`` so the box is responsive —
     it reflows as the browser window changes size. Colors use translucent tones
     so it reads well in both light and dark themes.
-
-    The text is HTML-escaped (``&``, ``<``, ``>``) and its Markdown-significant
-    characters are entity-encoded so every character is shown literally and no
-    markup can be injected.
     """
-    escaped = html.escape(text, quote=False)
-    for char, entity in _MD_NEUTRALIZE.items():
-        escaped = escaped.replace(char, entity)
+    escaped = escape_literal(text)
     st.markdown(
         f"""
 <div style="
@@ -110,6 +117,51 @@ def channel_preview_box(text: str) -> None:
 """,
         unsafe_allow_html=True,
     )
+
+
+def build_candidates_table_html(rows: list[dict]) -> str:
+    """Build a responsive, wrapping HTML table of retrieval candidates.
+
+    Pure function (no Streamlit) so it can be unit-tested. Each row is a dict with
+    ``faq_id``, ``question`` and ``score``. ``table-layout:fixed`` plus
+    ``word-break``/``overflow-wrap`` on cells make long questions **wrap** instead
+    of overflowing; the whole table is ``width:100%`` and wrapped in an
+    ``overflow-x:auto`` container as a final safety net, so it stays responsive.
+    """
+    body = ""
+    for r in rows:
+        question = escape_literal(r.get("question", ""))
+        score = r.get("score", "")
+        score_str = f"{score:.4f}" if isinstance(score, (int, float)) else escape_literal(score)
+        body += (
+            f"<tr><td>{escape_literal(r.get('faq_id', ''))}</td>"
+            f"<td>{question}</td><td>{score_str}</td></tr>"
+        )
+    return f"""
+<div class="faq-diag" style="overflow-x:auto;max-width:100%;">
+  <style>
+    .faq-diag table {{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:0.85rem; }}
+    .faq-diag th, .faq-diag td {{
+        text-align:left; padding:6px 8px; vertical-align:top;
+        border-bottom:1px solid rgba(128,128,128,0.25);
+        word-break:break-word; overflow-wrap:anywhere; white-space:normal;
+    }}
+    .faq-diag th {{ background:rgba(128,128,128,0.12); font-weight:600; }}
+    .faq-diag col.c-id {{ width:64px; }}
+    .faq-diag col.c-score {{ width:84px; }}
+  </style>
+  <table>
+    <colgroup><col class="c-id"><col class="c-q"><col class="c-score"></colgroup>
+    <thead><tr><th>faq_id</th><th>question</th><th>score</th></tr></thead>
+    <tbody>{body}</tbody>
+  </table>
+</div>
+"""
+
+
+def candidates_table(rows: list[dict]) -> None:
+    """Render the responsive retrieval-candidates table (see builder)."""
+    st.markdown(build_candidates_table_html(rows), unsafe_allow_html=True)
 
 
 def confidence_badge(level: ConfidenceLevel) -> None:

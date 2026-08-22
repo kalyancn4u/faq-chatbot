@@ -17,7 +17,12 @@ from app.retrieval.search import SemanticSearch
 from app.services.faq_service import AnswerResult, AnswerStatus, FAQService
 from app.services.feedback_service import FeedbackService
 from app.services.response_formatter import Channel, format_reply
-from app.ui.components import channel_preview_box, confidence_badge, get_index_manager
+from app.ui.components import (
+    candidates_table,
+    channel_preview_box,
+    confidence_badge,
+    get_index_manager,
+)
 
 
 def _answer(question: str) -> AnswerResult:
@@ -122,7 +127,7 @@ def _render_diagnostics(result: AnswerResult) -> None:
             }
         )
         if result.alternative_matches:
-            st.table(
+            candidates_table(
                 [
                     {"faq_id": a.faq_id, "question": a.question, "score": round(a.score, 4)}
                     for a in result.alternative_matches
