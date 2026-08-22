@@ -11,6 +11,16 @@ the project spec. The SPEC is instructions.md — read it first.
        data model, retrieval service contract, admin, code style/structure, and
        the V2+ extensibility roadmap). This handoff does NOT repeat any of it.
 
+  >>> BUILD PLAYBOOKS (the code walk-through: markdown docs + HTML slide decks):
+      instructions_ppt.md       — the narrated how-and-why THIS walk-through was
+                                   built (design system, build pipeline, overflow
+                                   discipline, WCAG type/contrast, publishing).
+      instructions_codewalk.md  — a portable, repo-agnostic KIT: drop into ANY repo
+                                   to generate the docs + HTML decks + a live
+                                   github.io site; embeds the exact theme CSS,
+                                   .marprc.yml, build script, and Pages workflow.
+      (See section 6/7 below for the day-to-day build/publish commands & gotchas.)
+
 This handoff only adds: current status, git/remote, the environment quirks, the
 exact run/test/build commands, the Marp build gotchas, a file map, and next steps.
 
