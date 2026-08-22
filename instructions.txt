@@ -82,12 +82,17 @@ Publish: push to main -> .github/workflows/pages.yml rebuilds + deploys to Pages
 (Pages already enabled once via `gh api ... /pages -f build_type=workflow`; the
  Actions token CANNOT create the site, so don't rely on enablement:true.)
 
-Visual QA (the in-app browser pane is flaky here) — render slides to PNG & open:
+VISUAL QA — IMPORTANT: the in-app browser/preview pane was UNRELIABLE this
+session (navigation "denied", pane not compositing so screenshots time out, and
+tabs stealing focus). Do NOT depend on it for judging how slides look. Instead
+render slides to PNG and open the images — this is the reliable check:
     marp docs/walkthrough/06-*.md --images png -c .marprc.yml --no-stdin \
       --allow-local-files --theme docs/walkthrough/assets/marp-theme.css -o /tmp/png/ch.png
-Overflow check: serve build/slides, in the console measure
+    # then open /tmp/png/ch.006.png etc.
+Overflow check (still fine to run in a browser): serve build/slides on a local
+static server and, in the deck's console, measure AFTER the page settles
+(re-run once; first paint can report a phantom ~20px):
     [...document.querySelectorAll('section')].map(s=>s.scrollHeight-s.clientHeight)
-    (re-run AFTER the page settles; first paint can show a phantom ~20px).
 
 Full slide/design/publish details -> instructions_ppt.md (this repo) and
 instructions_codewalk.md (portable, any repo).
