@@ -176,6 +176,23 @@ python scripts/import_faqs.py path/to/your.csv   # import your own FAQs
 python scripts/rebuild_index.py --status         # inspect index/DB consistency
 ```
 
+### Or use the Makefile
+
+A [`Makefile`](Makefile) wraps the common tasks — `make help` lists them all:
+
+```bash
+make setup    # create .venv and install deps (prod + dev)
+make data     # initialize the DB (+sample FAQs) and build the index
+make run      # launch the Streamlit app
+make test     # run the test suite
+make slides   # build the walk-through decks into docs/walkthrough/slides/
+```
+
+The recipes use a POSIX shell. **On Windows, run `make` from Git Bash** (not
+PowerShell/cmd); it also works as-is on macOS/Linux/CI. The venv path and base
+interpreter are auto-detected — override the base with, e.g.,
+`make setup BASE_PYTHON=/c/Python312/python.exe`.
+
 ## Sample questions to try
 
 - "I can't remember my login password" → password reset FAQ (high confidence)
