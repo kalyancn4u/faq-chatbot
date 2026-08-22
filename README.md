@@ -283,6 +283,14 @@ tests/                    pytest suite                             (Phase 7)
 pytest
 ```
 
+## Project docs
+
+- [CHANGELOG.md](CHANGELOG.md) — what shipped, per version.
+- [instructions.md](instructions.md) — the project spec (scope, architecture, conventions).
+- [instructions_ppt.md](instructions_ppt.md) / [instructions_codewalk.md](instructions_codewalk.md)
+  — how the code walk‑through was built, and a portable kit to build one for any repo.
+- [instructions.txt](instructions.txt) — a plain‑text handoff to resume work in a new session.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

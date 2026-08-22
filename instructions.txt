@@ -1,0 +1,145 @@
+===============================================================================
+ SEMANTIC FAQ CHATBOT — HANDOFF / "CONTINUE HERE" NOTES
+ Last updated: 2026-08-22   |   Version: 1.0.0   |   Status: V1 COMPLETE & LIVE
+===============================================================================
+
+Read this first when resuming in a new chat/session. It captures the current
+state, the environment quirks, how to run everything, and what is safe to do
+next. For deeper detail see the linked docs at the bottom.
+
+-------------------------------------------------------------------------------
+1. WHAT THIS PROJECT IS
+-------------------------------------------------------------------------------
+A local-first Semantic FAQ Chatbot (Python 3.12, CPU-only, no GPU/cloud/LLM).
+It answers questions by MEANING using:
+    Streamlit UI -> Sentence-Transformers embedding -> FAISS search
+                 -> SQLite (system of record) -> confidence handling -> reply
+Two design laws:
+    #1  SQLite is the source of truth; FAISS is a DERIVED index (rebuilt from it).
+    #2  A weak match never becomes an answer (confidence bands; honest fallback).
+V1 retrieves CURATED answers only; it never generates/hallucinates.
+
+Plus: a full "code walk-through" (markdown docs + Marp HTML slide decks + a live
+GitHub Pages site) and two reusable playbooks for building such walk-throughs.
+
+-------------------------------------------------------------------------------
+2. REPO / GIT
+-------------------------------------------------------------------------------
+Remote : git@github.com:kalyancn4u/faq-chatbot.git  (public)
+Branch : main   (push here; CI publishes the slides on push)
+Live slides : https://kalyancn4u.github.io/faq-chatbot/
+
+-------------------------------------------------------------------------------
+3. ENVIRONMENT (IMPORTANT — non-obvious)
+-------------------------------------------------------------------------------
+* `python` / `python3` / `py` on PATH are Microsoft Store STUBS (they error).
+  The REAL interpreter is Miniconda:  D:\tools\miniconda3\python.exe (3.12.9).
+* Project dependencies live in a repo-local venv:  .venv\  (created from the
+  Miniconda python). Use  .venv\Scripts\python.exe  to run app/tests.
+* Do NOT use conda to install here: `conda create`/repo access fails with
+  CondaSSLError (this network intercepts TLS). `pip` + PyPI WORKS.
+  The base pip config has a dead extra-index-url (pypi.ngc.nvidia.com) +
+  no-cache-dir=true -> harmless but slow; use `--index-url https://pypi.org/simple`.
+* The same TLS interception blocks huggingface.co, so the embedding model loads
+  from local cache: `.env` sets HF_OFFLINE=1 (wired via settings.py -> sets
+  HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE). Model all-MiniLM-L6-v2 IS already cached.
+* Building the SLIDES needs Node.js (Marp CLI). Node 18/20 present; `marp`
+  installed globally (v4.x). CI installs it fresh.
+* Shell: PowerShell primary; Git Bash also available. Pass Python scripts as
+  files (inline `-c` with quotes gets mangled through PowerShell).
+
+-------------------------------------------------------------------------------
+4. RUN THE APP
+-------------------------------------------------------------------------------
+    .venv\Scripts\activate
+    python scripts\initialize_database.py --with-sample   # once: schema + 30 FAQs
+    python scripts\rebuild_index.py                        # build FAISS index
+    streamlit run app\main.py                              # open the app
+Sidebar: switch Chat/Admin, pick "Reply format" (Chat/WhatsApp/Telegram/SMS),
+toggle "Developer mode" for retrieval diagnostics.
+
+-------------------------------------------------------------------------------
+5. RUN THE TESTS
+-------------------------------------------------------------------------------
+    .venv\Scripts\python.exe -m pytest -q          # expect: 44 passed
+(First run loads the real model once; ~10s thereafter with HF_OFFLINE.)
+
+-------------------------------------------------------------------------------
+6. BUILD / PUBLISH THE SLIDE DECKS
+-------------------------------------------------------------------------------
+Local build (needs Node):
+    scripts\build_slides.ps1        # Windows;  -Pdf also exports PDFs
+    ./scripts/build_slides.sh       # macOS/Linux/CI;  --pdf for PDFs
+    -> decks in build/slides/ (open walkthrough-full.html)
+Publish: push to main -> .github/workflows/pages.yml rebuilds + deploys to Pages.
+Pages was already enabled once (gh api ... /pages -f build_type=workflow); the
+Actions token CANNOT create the Pages site, so never rely on enablement:true.
+
+VISUAL QA WITHOUT THE BROWSER PANE (it is flaky here):
+    render slides to PNG and open them, e.g.
+    marp docs/walkthrough/06-*.md --images png -c .marprc.yml --no-stdin \
+      --allow-local-files --theme docs/walkthrough/assets/marp-theme.css -o /tmp/png/ch.png
+Overflow check: serve build/slides, in console measure
+    [...document.querySelectorAll('section')].map(s=>s.scrollHeight-s.clientHeight)
+    (re-run AFTER the page settles; first paint can show a phantom ~20px).
+
+-------------------------------------------------------------------------------
+7. MARP / BUILD GOTCHAS (already handled — keep them)
+-------------------------------------------------------------------------------
+* .marprc.yml has `breaks: false` (else Marp turns source hard-wraps into <br>
+  and footnotes/body wrap early with a right gutter). Build passes -c .marprc.yml.
+* Always pass --no-stdin (Marp hangs waiting on stdin when not a TTY).
+* Marp does NOT inline <img> into HTML -> build copies assets/*.svg next to decks.
+* Deck is pinned light (:root{color-scheme:light}) so dark-mode viewers don't get
+  dark text on a dark slide (imported theme uses light-dark()).
+* Do NOT run two slide builds at once (they share temp files _build_*.md in
+  docs/walkthrough and clobber each other).
+* PowerShell 5.1 reads BOM-less files as ANSI -> build_slides.ps1 reads UTF-8 and
+  stays ASCII-only; it judges Marp by exit code (native stderr looks fatal).
+
+-------------------------------------------------------------------------------
+8. KEY FILES / DOC MAP
+-------------------------------------------------------------------------------
+App code        : app/ (config, database, embeddings, retrieval, services, ui)
+Tests           : tests/
+Scripts         : scripts/ (initialize_database, import_faqs, rebuild_index,
+                             build_slides.sh/.ps1, _bootstrap)
+Data            : data/ (sample/faqs.csv, database/*.db [gitignored],
+                         indexes/* [gitignored])
+Project spec    : instructions.md
+Reader README   : README.md  (has the Code Walk-Through section + links)
+Channels guide  : docs/CHANNELS.md
+Walk-through    : docs/walkthrough/  (README.md landing, 01-10 chapters,
+                  GLOSSARY.md, assets/marp-theme.css, assets/architecture.svg)
+Build playbooks : instructions_ppt.md      (narrated: how THIS was built)
+                  instructions_codewalk.md  (portable kit for ANY repo)
+CI              : .github/workflows/pages.yml
+Marp config     : .marprc.yml
+This file       : instructions.txt   |   Changelog: CHANGELOG.md
+
+-------------------------------------------------------------------------------
+9. CONVENTIONS / PREFERENCES TO HONOR
+-------------------------------------------------------------------------------
+* Act as senior engineer + teacher + data scientist; explain the WHY, note
+  trade-offs, prefer Simple > Correct > Tested > Maintainable > Extensible.
+* Every code snippet/mention (docs AND chat) must NAME its source file
+  unambiguously (e.g. a `# path/to/file.py` header comment).
+* Walk-through slides: one idea per slide; short lead + bullets where apt;
+  footnotes as a bulleted list (one bullet per reference); keep 0 overflow;
+  WCAG 2.2 AA contrast; auditorium-legible type scale.
+* Confirm before outward-facing/irreversible actions; report outcomes honestly.
+
+-------------------------------------------------------------------------------
+10. POSSIBLE NEXT STEPS (not yet done — ideas)
+-------------------------------------------------------------------------------
+* Actually SEND to a channel (e.g. Telegram Bot API using escape_markdown_v2).
+* Tune similarity thresholds against real feedback; add category-filtered search.
+* V2+ roadmap: feedback analytics -> PDF/doc ingestion -> Chroma (optional) ->
+  local LLM (Ollama) + RAG -> FastAPI/Docker/auth. (Design for, don't build yet.)
+* Optional: soften the black slide backdrop to a neutral grey (see
+  instructions_ppt.md / instructions_codewalk.md).
+* A GitHub Actions workflow to run `pytest` on push (currently only Pages CI).
+
+===============================================================================
+ To resume: read this file, then `git pull`, activate .venv, and you're set.
+===============================================================================
