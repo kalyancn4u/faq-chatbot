@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from app.services.response_formatter import CHANNEL_LABELS, channel_from_label
 from app.ui.admin import render_admin_page
 from app.ui.chat import render_chat_page
 from app.ui.components import bootstrap
@@ -29,11 +30,17 @@ def main() -> None:
         st.header("Navigation")
         page = st.radio("Page", ["Chat", "Admin"], label_visibility="collapsed")
         st.divider()
+        channel_label = st.selectbox(
+            "Reply format",
+            options=CHANNEL_LABELS,
+            index=0,
+            help="Preview the reply as it would be sent on each channel.",
+        )
         dev_mode = st.toggle("Developer mode", value=False, help="Show retrieval diagnostics.")
         st.caption("Local-first · SQLite + FAISS + Sentence Transformers")
 
     if page == "Chat":
-        render_chat_page(dev_mode=dev_mode)
+        render_chat_page(channel=channel_from_label(channel_label), dev_mode=dev_mode)
     else:
         render_admin_page()
 

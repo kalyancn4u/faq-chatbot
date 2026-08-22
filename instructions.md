@@ -73,6 +73,12 @@ Never fabricate. Configurable thresholds.
 **Feedback loop** — store `{user_question, faq_id, similarity_score, was_helpful, timestamp}` in
 SQLite. Used to inform coverage, thresholds, wording, duplicates. No auto-retraining in V1.
 
+**Reply formats (channels)** — a formatter layer (`response_formatter.py`) tailors each reply
+to a chosen channel: **Chat window** (rich Markdown), **WhatsApp** (`*bold*`, emoji, ~4096),
+**Telegram** (MarkdownV2 with escaping, ~4096), **SMS** (plain, no emoji, 160/segment, extras
+dropped). Sidebar selector previews the reply as-sent; switching reformats the conversation.
+V1 previews/formats only (no actual sending). Add a channel = add one `ChannelSpec`.
+
 **Config (centralized, env-overridable)** — `TOP_K`, `SIMILARITY_THRESHOLD`, model name, paths.
 Never hard-code these across the codebase. Document that thresholds need **empirical tuning**.
 

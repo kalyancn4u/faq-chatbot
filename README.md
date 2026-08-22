@@ -133,6 +133,23 @@ python scripts/rebuild_index.py --status         # inspect index/DB consistency
 - "where is my parcel" → order tracking FAQ
 - "what's the meaning of life" → honest fallback (logged for admin review)
 
+## Reply formats (channels)
+
+The same answer is written differently depending on where it would be sent. Pick a
+channel from the sidebar's **Reply format** selector and the chat window previews
+the reply exactly as it would arrive:
+
+| Channel | Bold | Emoji | Limit | Notes |
+|---------|------|-------|-------|-------|
+| Chat window | `**bold**` | ✅ | none | full Markdown (default) |
+| WhatsApp | `*bold*` | ✅ | ~4096 | single-asterisk bold |
+| Telegram | `*bold*` | ✅ | ~4096 | MarkdownV2 — `. - ( ) ! >` are backslash-escaped |
+| SMS | none | ❌ | 160/segment | plain text; confidence + related list dropped to save length |
+
+Switching the selector reformats the whole conversation instantly, so you can
+verify each channel. **New to this? Read the full beginner's guide:
+[docs/CHANNELS.md](docs/CHANNELS.md).**
+
 ## How confidence handling works
 
 Each match has a cosine-similarity score in roughly `0.0–1.0`. Two thresholds split matches
@@ -202,9 +219,10 @@ app/
   database/               SQLite: connection, schema, repository   (Phase 2)
   embeddings/             sentence-transformers wrapper            (Phase 3)
   retrieval/              FAISS index + search                     (Phase 4-5)
-  services/               FAQ / feedback / admin services          (Phase 5)
+  services/               FAQ / feedback / admin / response_formatter services
   ui/                     chat + admin pages                       (Phase 6)
 data/                     sample FAQs, SQLite db, FAISS indexes
+docs/                     CHANNELS.md (reply-format beginner's guide)
 scripts/                  initialize_database / import_faqs / rebuild_index
 tests/                    pytest suite                             (Phase 7)
 ```
