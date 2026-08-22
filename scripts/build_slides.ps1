@@ -52,13 +52,20 @@ function Invoke-Marp {
 
 New-Item -ItemType Directory -Force -Path $OutPath | Out-Null
 
+# Marp keeps relative image paths in HTML (it does not inline them), so copy the
+# images next to the decks: 'assets/architecture.svg' then resolves from OutPath.
+$assetsDst = Join-Path $OutPath "assets"
+New-Item -ItemType Directory -Force -Path $assetsDst | Out-Null
+Copy-Item (Join-Path $WalkDir "assets/*.svg") $assetsDst -Force -ErrorAction SilentlyContinue
+
 # Keep this script ASCII-only: Windows PowerShell 5.1 reads BOM-less .ps1 files as
 # ANSI, which would corrupt any non-ASCII literal here. (Chapter content keeps its
 # Unicode because we read it explicitly as UTF-8 below.)
+$Theme = Join-Path $WalkDir "assets/marp-theme.css"
 $FrontMatter = @"
 ---
 marp: true
-theme: default
+theme: walkthrough
 paginate: true
 footer: 'Semantic FAQ Chatbot - Code Walk-Through'
 ---
@@ -79,10 +86,10 @@ try {
 
         $outHtml = Join-Path $OutPath ($ch.BaseName + ".html")
         Write-Host "Building $($ch.Name) -> $outHtml"
-        Invoke-Marp @($tmp, "-o", $outHtml, "--allow-local-files")
+        Invoke-Marp @($tmp, "-o", $outHtml, "--allow-local-files", "--theme", $Theme)
         if ($Pdf) {
             $outPdf = Join-Path $OutPath ($ch.BaseName + ".pdf")
-            Invoke-Marp @($tmp, "-o", $outPdf, "--pdf", "--allow-local-files")
+            Invoke-Marp @($tmp, "-o", $outPdf, "--pdf", "--allow-local-files", "--theme", $Theme)
         }
     }
 
@@ -94,9 +101,9 @@ try {
 
     $combinedHtml = Join-Path $OutPath "walkthrough-full.html"
     Write-Host "Building combined deck -> $combinedHtml"
-    Invoke-Marp @($combinedTmp, "-o", $combinedHtml, "--allow-local-files")
+    Invoke-Marp @($combinedTmp, "-o", $combinedHtml, "--allow-local-files", "--theme", $Theme)
     if ($Pdf) {
-        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath "walkthrough-full.pdf"), "--pdf", "--allow-local-files")
+        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath "walkthrough-full.pdf"), "--pdf", "--allow-local-files", "--theme", $Theme)
     }
 }
 finally {

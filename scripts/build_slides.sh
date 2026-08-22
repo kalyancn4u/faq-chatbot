@@ -33,7 +33,13 @@ fi
 
 mkdir -p "$OUT_DIR"
 
-FRONT_MATTER=$'---\nmarp: true\ntheme: default\npaginate: true\nfooter: \'Semantic FAQ Chatbot - Code Walk-Through\'\n---\n\n'
+# Marp keeps relative image paths in HTML (it does not inline them), so copy the
+# images next to the decks: `assets/architecture.svg` then resolves from OUT_DIR.
+mkdir -p "$OUT_DIR/assets"
+cp "$WALK_DIR/assets/"*.svg "$OUT_DIR/assets/" 2>/dev/null || true
+
+THEME="$WALK_DIR/assets/marp-theme.css"
+FRONT_MATTER=$'---\nmarp: true\ntheme: walkthrough\npaginate: true\nfooter: \'Semantic FAQ Chatbot - Code Walk-Through\'\n---\n\n'
 
 # Collect numbered chapters (01-..10-) in order; README.md/GLOSSARY.md excluded.
 mapfile -t CHAPTERS < <(find "$WALK_DIR" -maxdepth 1 -name '[0-9][0-9]-*.md' | sort)
@@ -48,7 +54,7 @@ trap cleanup EXIT
 
 marp_build() { # $1 = input md, $2 = output path, $3 = optional --pdf
   # shellcheck disable=SC2086  # MARP_CMD is intentionally word-split (e.g. "npx --yes ...")
-  $MARP_CMD "$1" -o "$2" --allow-local-files ${3:-}
+  $MARP_CMD "$1" -o "$2" --allow-local-files --theme "$THEME" ${3:-}
 }
 
 # --- one deck per chapter ---
