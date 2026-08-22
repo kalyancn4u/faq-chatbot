@@ -50,6 +50,17 @@ extensive footnotes, pitfalls, and hands-on exercises on every page.
   auto-published to GitHub Pages on every push (combined deck + one per chapter).
 - **[📖 Glossary](docs/walkthrough/GLOSSARY.md)** — every term (embedding, cosine, FAISS,
   invariant, soft-delete…) defined in plain language.
+- **[🛠️ Build-it-yourself playbook](instructions_ppt.md)** — `instructions_ppt.md`: how to
+  create a walk-through like this from scratch (structure, the Marp design system, the build
+  pipeline, overflow discipline, WCAG-aware type/contrast, and publishing).
+
+**Read it, present it, or build the decks yourself:**
+
+```bash
+./scripts/build_slides.ps1     # Windows (PowerShell);  add -Pdf for PDFs
+./scripts/build_slides.sh      # macOS/Linux;           add --pdf for PDFs
+```
+Decks land in `build/slides/` (open `walkthrough-full.html`). Requires [Node.js](https://nodejs.org).
 
 <details>
 <summary><b>The ten chapters (click to expand)</b></summary>
@@ -60,7 +71,7 @@ extensive footnotes, pitfalls, and hands-on exercises on every page.
 | 2 | [Configuration & Logging](docs/walkthrough/02-configuration-and-logging.md) | Centralized config, frozen dataclasses, env overrides |
 | 3 | [The Database Layer](docs/walkthrough/03-the-database-layer.md) | SQLite, repository pattern, parameterized queries, soft-delete |
 | 4 | [Embeddings](docs/walkthrough/04-embeddings.md) | What an embedding is, cosine, normalization, model caching |
-| 5 | [FAISS & the Index](docs/walkthrough/05-faiss-and-the-index.md) | Vector search, the id map, atomic rebuild, the consistency invariant |
+| 5 | [FAISS & the Index](docs/walkthrough/05-faiss-and-the-index.md) | Vector search, the id map, atomic rebuild, the consistency invariant — **+ Appendix A: "Why not Chroma?"** |
 | 6 | [Retrieval & Confidence](docs/walkthrough/06-retrieval-and-confidence.md) | The service layer, confidence bands, why V1 can't hallucinate |
 | 7 | [Channels & Formatting](docs/walkthrough/07-channels-and-formatting.md) | Chat/WhatsApp/Telegram/SMS, MarkdownV2 escaping, SMS segments |
 | 8 | [The Streamlit UI](docs/walkthrough/08-the-streamlit-ui.md) | Rerun model, `cache_resource`, `session_state`, safe HTML |

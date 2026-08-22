@@ -65,8 +65,8 @@ plainly, cross-linked from the footnotes.
 
 - **Code excerpts are illustrative**, often trimmed for focus. Each links to the
   real file so you can read it in full — e.g. [settings.py](../../app/config/settings.py).
-- Inline markers like `[1]` point to the **Footnotes** block at the bottom of that
-  same slide.
+- Inline markers like `[1]` point to the bulleted **Footnotes** block at the bottom of
+  that same slide (one bullet per reference).
 - 🧠 **Nuance** callouts highlight a subtle "why." ⚠️ **Pitfall** callouts warn of a
   common mistake. 🛠️ **Try it** callouts are hands-on exercises.
 - Terms in **bold italic** like ***embedding*** are defined in the [Glossary](GLOSSARY.md).
@@ -89,4 +89,6 @@ full setup, and Chapter 1 explains what each step does.
 ---
 
 *This walk-through documents the code as of Version 1. It pairs with the reader-facing
-[README](../../README.md) and the [channels guide](../CHANNELS.md).*
+[README](../../README.md) and the [channels guide](../CHANNELS.md). Want to build a
+walk-through like this for your own project? See the
+[build-it-yourself playbook](../../instructions_ppt.md).*

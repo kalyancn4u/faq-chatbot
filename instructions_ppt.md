@@ -127,15 +127,20 @@ white area. Defend against it:
 
 1. Keep **code, table, and footnote fonts tight** (they're the tallest content).
 2. **Measure, don't guess** (§6): assert `scrollHeight ≤ clientHeight` on every slide.
-3. For a single unavoidably‑tall slide (e.g. a big ASCII diagram), use a **scoped escape
-   hatch** instead of shrinking everything:
+3. For a single unavoidably‑tall slide, use a **scoped escape hatch** (a per‑slide class)
+   instead of shrinking every slide:
    ```markdown
    ## The architecture — text version
-   <!-- _class: diagram-text -->
+   <!-- _class: diagram-text -->     ← just this slide's code gets smaller
    ```
    ```css
-   section.diagram-text pre { font-size: 12px; line-height: 1.32; }
+   section.diagram-text pre { font-size: 12.5px; line-height: 1.34; }
+   section.dense { font-size: 19px; }              /* whole-slide shrink */
+   section.dense pre { font-size: 13px; }
+   section.dense blockquote, section.dense blockquote li { font-size: 13.5px; }
    ```
+4. **Don't shrink the slide toward 16:9** to fit more — the taller 1280×940 *is* the room.
+   Reducing height steals the space the dense slides depend on.
 
 ---
 
@@ -186,24 +191,32 @@ options:
 
 Two fast, reliable checks:
 
-**Overflow (must be zero).** Serve the decks and measure every slide in the browser:
+**Overflow (must be zero).** Serve the decks and measure every slide in the browser —
+**after the page settles** (measure at first paint and web‑font/monospace metrics can
+report a phantom ~20px overflow that clears on reflow):
 
 ```js
-// run in the deck page's console (or via an automation tool)
+// run in the deck page's console (or via an automation tool), then re-run once
 [...document.querySelectorAll('section')]
   .map((s,i) => ({ slide:i+1, vOver: s.scrollHeight - s.clientHeight }))
   .filter(x => x.vOver > 2);   // expect []  (also check pre/table horizontal overflow)
 ```
 
-**Look at the pixels.** Render slides to PNG and inspect them — no flaky browser pane:
+**Look at the pixels.** Render slides to PNG and inspect them — no flaky browser pane
+(this is the *reliable* visual check; use the same config/flags as the build):
 
 ```bash
-marp chapter.md --images png --allow-local-files --theme assets/marp-theme.css -o out/ch.png
+marp chapter.md --images png -c .marprc.yml --no-stdin \
+  --allow-local-files --theme assets/marp-theme.css -o out/ch.png
 # → out/ch.001.png, ch.002.png, … open/read them
 ```
 
 Check the worst‑case slides: the densest code slide, the biggest table, and any
 image/ASCII slide. Confirm the citation band reads as subordinate and nothing is clipped.
+
+**Test dark mode.** If you pinned the deck light (§9), confirm it: emulate a dark OS theme
+and check a slide's background stays white with dark text —
+`getComputedStyle(document.querySelector('section')).backgroundColor` should be `rgb(255,255,255)`.
 
 ---
 
@@ -256,6 +269,12 @@ Then every push rebuilds and republishes the decks automatically.
   overrides use fixed light‑mode colours, pin the deck light with `:root { color-scheme: light; }`
   (it inherits to `section`, so `light-dark()` stays light) — otherwise dark‑mode viewers get
   dark text on a dark slide.
+- **First‑paint overflow is a phantom** — measure overflow *after* the page settles (fonts/
+  monospace metrics finalise), or re‑run the check; the first read can show ~20px that clears.
+- **The stage around a slide is `body { background: #000 }`** (Marp's default). A tall slide
+  letterboxes, so light slides sit in a black frame. Optional: soften it with
+  `html body { background: #d7dbe1 }` (specificity beats the template's `body{}`). Left black
+  here because it's fine for full‑screen projection; change it for in‑browser reading.
 
 ---
 
