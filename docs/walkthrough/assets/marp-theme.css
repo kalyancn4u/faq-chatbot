@@ -16,6 +16,9 @@
 @import 'default';
 
 :root {
+  color-scheme: light;  /* deck is designed light; pin it so the imported theme's
+                           light-dark() tokens never flip to dark (which would put
+                           our fixed dark text on a dark slide). */
   --ink:    #1f2328;   /* primary text            */
   --muted:  #5b6570;   /* secondary / citations   */
   --faint:  #8a929c;   /* labels, markers, footer  */

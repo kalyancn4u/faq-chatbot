@@ -52,9 +52,10 @@ TEMP_FILES=()
 cleanup() { for t in "${TEMP_FILES[@]:-}"; do [ -f "$t" ] && rm -f "$t"; done; }
 trap cleanup EXIT
 
+CONFIG="$REPO_ROOT/.marprc.yml"          # markdown options (e.g. breaks: false)
 marp_build() { # $1 = input md, $2 = output path, $3 = optional --pdf
   # shellcheck disable=SC2086  # MARP_CMD is intentionally word-split (e.g. "npx --yes ...")
-  $MARP_CMD "$1" -o "$2" --allow-local-files --theme "$THEME" ${3:-}
+  $MARP_CMD "$1" -o "$2" -c "$CONFIG" --no-stdin --allow-local-files --theme "$THEME" ${3:-}
 }
 
 # --- one deck per chapter ---

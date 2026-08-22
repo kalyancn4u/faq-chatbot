@@ -148,8 +148,26 @@ What the scripts do, and **why**:
 2. Build each chapter **and** a concatenated `walkthrough-full.html`.
 3. **Copy `assets/*.svg` next to the decks** — Marp does **not** inline `<img>` into HTML,
    so a relative `assets/architecture.svg` would 404 without this.
-4. Pass `--allow-local-files --theme assets/marp-theme.css`.
+4. Pass `-c .marprc.yml --no-stdin --allow-local-files --theme assets/marp-theme.css`.
 5. Clean up temp files in a `finally`/`trap`.
+
+**Two Marp options that matter a lot** (in `.marprc.yml` / the CLI flags):
+
+```yaml
+# .marprc.yml
+options:
+  markdown:
+    breaks: false     # single newlines are spaces, not <br>
+```
+
+- **`breaks: false`** — Marp's default is `breaks: true`, which turns every single newline in
+  the source into a hard `<br>`. If (like here) you hard‑wrap Markdown at ~90 cols for readable
+  diffs, the *slides* then wrap at that ~90‑col point, leaving a big empty gutter on the right
+  and making footnotes "wrap too early". Setting `breaks: false` lets text flow to the full
+  slide width and wrap naturally — and matches how GitHub already renders your `.md`.
+- **`--no-stdin`** — Marp CLI blocks *waiting on stdin* when it isn't attached to a TTY
+  (backgrounded builds, some CI). Always pass `--no-stdin` for file‑based builds or the build
+  hangs forever.
 
 ---
 
@@ -220,6 +238,13 @@ Then every push rebuilds and republishes the decks automatically.
   will clobber each other ("Not found processable Markdown").
 - **HTML comments (`<!-- _class: … -->`) are invisible** in both Marp and GitHub — safe for
   per‑slide directives.
+- **Marp's `breaks: true` default** turns hard‑wrapped source into `<br>` → text wraps early
+  with a right gutter. Set `breaks: false` (see §5).
+- **Marp CLI hangs waiting on stdin** when not a TTY → always pass `--no-stdin`.
+- **Imported `default` theme is dark‑mode‑aware** (`light-dark()` + `color-scheme`). If your
+  overrides use fixed light‑mode colours, pin the deck light with `:root { color-scheme: light; }`
+  (it inherits to `section`, so `light-dark()` stays light) — otherwise dark‑mode viewers get
+  dark text on a dark slide.
 
 ---
 

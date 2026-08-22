@@ -62,6 +62,7 @@ Copy-Item (Join-Path $WalkDir "assets/*.svg") $assetsDst -Force -ErrorAction Sil
 # ANSI, which would corrupt any non-ASCII literal here. (Chapter content keeps its
 # Unicode because we read it explicitly as UTF-8 below.)
 $Theme = Join-Path $WalkDir "assets/marp-theme.css"
+$Config = Join-Path $RepoRoot ".marprc.yml"     # markdown options (e.g. breaks: false)
 $FrontMatter = @"
 ---
 marp: true
@@ -86,10 +87,10 @@ try {
 
         $outHtml = Join-Path $OutPath ($ch.BaseName + ".html")
         Write-Host "Building $($ch.Name) -> $outHtml"
-        Invoke-Marp @($tmp, "-o", $outHtml, "--allow-local-files", "--theme", $Theme)
+        Invoke-Marp @($tmp, "-o", $outHtml, "-c", $Config, "--no-stdin", "--allow-local-files", "--theme", $Theme)
         if ($Pdf) {
             $outPdf = Join-Path $OutPath ($ch.BaseName + ".pdf")
-            Invoke-Marp @($tmp, "-o", $outPdf, "--pdf", "--allow-local-files", "--theme", $Theme)
+            Invoke-Marp @($tmp, "-o", $outPdf, "-c", $Config, "--pdf", "--no-stdin", "--allow-local-files", "--theme", $Theme)
         }
     }
 
@@ -101,9 +102,9 @@ try {
 
     $combinedHtml = Join-Path $OutPath "walkthrough-full.html"
     Write-Host "Building combined deck -> $combinedHtml"
-    Invoke-Marp @($combinedTmp, "-o", $combinedHtml, "--allow-local-files", "--theme", $Theme)
+    Invoke-Marp @($combinedTmp, "-o", $combinedHtml, "-c", $Config, "--no-stdin", "--allow-local-files", "--theme", $Theme)
     if ($Pdf) {
-        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath "walkthrough-full.pdf"), "--pdf", "--allow-local-files", "--theme", $Theme)
+        Invoke-Marp @($combinedTmp, "-o", (Join-Path $OutPath "walkthrough-full.pdf"), "-c", $Config, "--pdf", "--no-stdin", "--allow-local-files", "--theme", $Theme)
     }
 }
 finally {
