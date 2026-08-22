@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="820" viewBox="0 0 880 820" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Architecture of the Semantic FAQ Chatbot: a user question flows from the Streamlit UI to the Sentence Transformer, to FAISS, to SQLite, through confidence handling and channel formatting, to a reply. SQLite is the system of record and FAISS is a derived index rebuilt from it.">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#57606a"/>
+    </marker>
+    <marker id="arrowDash" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1a7f37"/>
+    </marker>
+  </defs>
+
+  <!-- self-contained background so the diagram is readable on any page theme -->
+  <rect x="0" y="0" width="880" height="820" rx="14" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+
+  <text x="440" y="42" text-anchor="middle" font-size="21" font-weight="700" fill="#1f2328">Semantic FAQ Chatbot — how a question flows</text>
+  <text x="440" y="66" text-anchor="middle" font-size="12.5" fill="#57606a">Top to bottom is exactly the path each chapter zooms into.</text>
+
+  <!-- ============ central pipeline boxes (x=310..570) ============ -->
+  <!-- b1 User -->
+  <rect x="310" y="90" width="260" height="46" rx="10" fill="#ffffff" stroke="#8250df" stroke-width="1.6"/>
+  <text x="440" y="118" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">User asks a question</text>
+
+  <!-- b2 Streamlit UI -->
+  <rect x="310" y="176" width="260" height="58" rx="10" fill="#ffffff" stroke="#8250df" stroke-width="1.6"/>
+  <text x="440" y="202" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">Streamlit UI</text>
+  <text x="440" y="220" text-anchor="middle" font-size="11.5" fill="#57606a">app/ui/ — chat &amp; admin pages</text>
+
+  <!-- b3 Sentence Transformer -->
+  <rect x="310" y="274" width="260" height="58" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="1.6"/>
+  <text x="440" y="300" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">Sentence Transformer</text>
+  <text x="440" y="318" text-anchor="middle" font-size="11.5" fill="#57606a">text → normalized 384-d embedding</text>
+
+  <!-- b4 FAISS -->
+  <rect x="310" y="372" width="260" height="58" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="1.6"/>
+  <text x="440" y="398" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">FAISS</text>
+  <text x="440" y="416" text-anchor="middle" font-size="11.5" fill="#57606a">nearest vectors (exact IndexFlatIP)</text>
+
+  <!-- b5 SQLite -->
+  <rect x="310" y="470" width="260" height="58" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="1.6"/>
+  <text x="440" y="496" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">SQLite — system of record</text>
+  <text x="440" y="514" text-anchor="middle" font-size="11.5" fill="#57606a">authoritative answer + metadata</text>
+
+  <!-- b6 Confidence -->
+  <rect x="310" y="568" width="260" height="58" rx="10" fill="#ffffff" stroke="#9a6700" stroke-width="1.6"/>
+  <text x="440" y="594" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">Confidence handling</text>
+  <text x="440" y="612" text-anchor="middle" font-size="11.5" fill="#57606a">answer · caveat · honest fallback</text>
+
+  <!-- b7 Channel formatting -->
+  <rect x="310" y="666" width="260" height="58" rx="10" fill="#ffffff" stroke="#8250df" stroke-width="1.6"/>
+  <text x="440" y="692" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">Channel formatting</text>
+  <text x="440" y="710" text-anchor="middle" font-size="11.5" fill="#57606a">Chat · WhatsApp · Telegram · SMS</text>
+
+  <!-- b8 Reply -->
+  <rect x="310" y="762" width="260" height="44" rx="10" fill="#ffffff" stroke="#8250df" stroke-width="1.6"/>
+  <text x="440" y="789" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2328">Reply shown to the user</text>
+
+  <!-- ============ arrows + edge labels ============ -->
+  <g stroke="#57606a" stroke-width="1.6" fill="none">
+    <line x1="440" y1="136" x2="440" y2="174" marker-end="url(#arrow)"/>
+    <line x1="440" y1="234" x2="440" y2="272" marker-end="url(#arrow)"/>
+    <line x1="440" y1="332" x2="440" y2="370" marker-end="url(#arrow)"/>
+    <line x1="440" y1="430" x2="440" y2="468" marker-end="url(#arrow)"/>
+    <line x1="440" y1="528" x2="440" y2="566" marker-end="url(#arrow)"/>
+    <line x1="440" y1="626" x2="440" y2="664" marker-end="url(#arrow)"/>
+    <line x1="440" y1="724" x2="440" y2="760" marker-end="url(#arrow)"/>
+  </g>
+  <g font-size="10.5" fill="#57606a" text-anchor="start">
+    <text x="450" y="160">opens the app</text>
+    <text x="450" y="258">question text</text>
+    <text x="450" y="356">query vector</text>
+    <text x="450" y="454">faq_id + similarity score</text>
+    <text x="450" y="552">FAQ record (active only)</text>
+    <text x="450" y="650">answer | fallback</text>
+    <text x="450" y="748">channel-formatted text</text>
+  </g>
+
+  <!-- ============ chapter tags (right) ============ -->
+  <g font-size="11" font-weight="600">
+    <g><rect x="612" y="192" width="64" height="26" rx="13" fill="#eef2ff" stroke="#8250df" stroke-width="1"/><text x="644" y="209" text-anchor="middle" fill="#8250df">Ch 8</text></g>
+    <g><rect x="612" y="290" width="64" height="26" rx="13" fill="#e7f0ff" stroke="#0969da" stroke-width="1"/><text x="644" y="307" text-anchor="middle" fill="#0969da">Ch 4</text></g>
+    <g><rect x="612" y="388" width="64" height="26" rx="13" fill="#e7f0ff" stroke="#0969da" stroke-width="1"/><text x="644" y="405" text-anchor="middle" fill="#0969da">Ch 5</text></g>
+    <g><rect x="612" y="486" width="64" height="26" rx="13" fill="#e6f4ea" stroke="#1a7f37" stroke-width="1"/><text x="644" y="503" text-anchor="middle" fill="#1a7f37">Ch 3</text></g>
+    <g><rect x="612" y="584" width="64" height="26" rx="13" fill="#fbf1d6" stroke="#9a6700" stroke-width="1"/><text x="644" y="601" text-anchor="middle" fill="#9a6700">Ch 6</text></g>
+    <g><rect x="612" y="682" width="64" height="26" rx="13" fill="#eef2ff" stroke="#8250df" stroke-width="1"/><text x="644" y="699" text-anchor="middle" fill="#8250df">Ch 7</text></g>
+  </g>
+
+  <!-- ============ Design Law #1: FAISS derived from SQLite (left) ============ -->
+  <!-- dashed curve from SQLite (left edge) up to FAISS (left edge) -->
+  <path d="M310,499 C210,499 210,401 310,401" fill="none" stroke="#1a7f37" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowDash)"/>
+  <rect x="24" y="410" width="196" height="80" rx="10" fill="#e6f4ea" stroke="#1a7f37" stroke-width="1"/>
+  <text x="122" y="432" text-anchor="middle" font-size="12" font-weight="700" fill="#1a7f37">Design Law #1</text>
+  <text x="122" y="452" text-anchor="middle" font-size="10.5" fill="#1f2328">FAISS is a derived index,</text>
+  <text x="122" y="467" text-anchor="middle" font-size="10.5" fill="#1f2328">rebuilt from SQLite — the</text>
+  <text x="122" y="482" text-anchor="middle" font-size="10.5" fill="#1f2328">single source of truth.</text>
+  <text x="245" y="380" text-anchor="middle" font-size="10" fill="#1a7f37" transform="rotate(-90 245 380)">rebuilt from</text>
+
+  <!-- ============ Design Law #2 note (left, lower) ============ -->
+  <rect x="24" y="568" width="196" height="98" rx="10" fill="#fbf1d6" stroke="#9a6700" stroke-width="1"/>
+  <text x="122" y="590" text-anchor="middle" font-size="12" font-weight="700" fill="#9a6700">Design Law #2</text>
+  <text x="122" y="610" text-anchor="middle" font-size="10.5" fill="#1f2328">A weak match never</text>
+  <text x="122" y="625" text-anchor="middle" font-size="10.5" fill="#1f2328">becomes an answer.</text>
+  <text x="122" y="643" text-anchor="middle" font-size="10.5" fill="#1f2328">score ≥ 0.65 → answer</text>
+  <text x="122" y="658" text-anchor="middle" font-size="10.5" fill="#1f2328">score &lt; 0.45 → fallback</text>
+  <path d="M220,600 C270,600 270,595 308,595" fill="none" stroke="#9a6700" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+</svg>

@@ -58,6 +58,10 @@ Everything in the codebase is an implementation detail of one of these four idea
 
 ## The architecture, as data flows
 
+![Architecture of the Semantic FAQ Chatbot: a question flows from the user through the Streamlit UI, the Sentence Transformer (embedding), FAISS (nearest vectors), and SQLite (authoritative answer), then through confidence handling and channel formatting to a reply. Design Law #1: FAISS is a derived index rebuilt from SQLite. Design Law #2: a weak match never becomes an answer.](assets/architecture.svg)
+
+<sub>*(Text version of the same diagram, for screen readers and slide/terminal viewing:)*</sub>
+
 ```text
    User types a question
             │

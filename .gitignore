@@ -12,6 +12,9 @@ env/
 # --- Environment / secrets ---
 .env
 
+# --- Slide-build temp files (created/removed by scripts/build_slides.*) ---
+docs/walkthrough/_build_*.md
+
 # --- App-generated artifacts (derived; not committed) ---
 data/database/*.db
 data/database/*.sqlite3

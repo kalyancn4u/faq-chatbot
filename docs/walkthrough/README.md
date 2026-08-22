@@ -24,11 +24,16 @@ them — the footnotes are where the nuance lives.
 > **Two ways to read it**
 > 1. **As a document** (recommended first pass): just scroll — it reads top to
 >    bottom like a book with slide breaks.
-> 2. **As slides** (for teaching/presenting): render any chapter with a Marp or
->    reveal.js tool, e.g.
->    `npx @marp-team/marp-cli@latest docs/walkthrough/01-big-picture.md -o slides.html`.
->    The `───` rules become slide boundaries and the footnotes sit at the bottom of
->    each slide.
+> 2. **As slides** (for teaching/presenting): build every chapter — plus one
+>    combined deck — into self-contained HTML with the included script:
+>    ```bash
+>    ./scripts/build_slides.ps1     # Windows (PowerShell);  add -Pdf for PDFs
+>    ./scripts/build_slides.sh      # macOS/Linux;           add --pdf for PDFs
+>    ```
+>    Decks land in `build/slides/` (open `walkthrough-full.html`). The script
+>    injects Marp front-matter into temporary copies, so the source files stay
+>    clean for GitHub. **Requires [Node.js](https://nodejs.org)** (Marp CLI is
+>    fetched automatically via `npx`).
 
 ---
 
